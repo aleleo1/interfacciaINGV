@@ -30,3 +30,11 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
+## Condizione Attuale
+L'applicazione mostra una demo di 2 grafici rappresentanti dati random caricati da https://jsonplaceholder.typicode.com/comments,
+simulando la velocità di SolidJS nel rappresentare un'insieme di dati nell'UI.
+
+Sfrutto inoltre le strategie di rendering di AstroJS per caricare i dati con la maggior efficenza possibile.
+Impostazione attuale:
+--- SSR
+--- SOLIDJS client caricato appena possibile (client:load directive)
