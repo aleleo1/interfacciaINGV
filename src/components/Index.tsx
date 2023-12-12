@@ -1,16 +1,13 @@
-import { DataProvider } from "./context";
+import { DataProvider } from "./data.context";
 import { Container } from "./ChartContainer";
 
 export default function Index() {
 
     return (
-        <div>
-
-            <DataProvider>
-                <Container type="BAR" />
-                {/* <ChartContainer type="PIE" /> */}
-            </DataProvider>
-
-        </div >
+        <DataProvider>
+            <Container type="BAR" />
+            <Container type="PIE" />
+            {/* <ChartContainer type="PIE" /> */}
+        </DataProvider>
     )
 }

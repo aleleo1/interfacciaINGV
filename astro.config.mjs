@@ -6,7 +6,7 @@ import tailwind from "@astrojs/tailwind";
 // https://astro.build/config
 export default defineConfig({
   site: 'https://aleleo1.github.io',
-  base: '/my-repo',
+  base: '/interfacciaINGV',
   output: "hybrid",
   integrations: [solidJs(), tailwind()]
 });
