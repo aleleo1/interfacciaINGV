@@ -36,5 +36,5 @@ simulando la velocità di SolidJS nel rappresentare un'insieme di dati nell'UI.
 
 Sfrutto inoltre le strategie di rendering di AstroJS per caricare i dati con la maggior efficenza possibile.
 Impostazione attuale:
---- SSR
+--- Hybrid (islands, pagina caricata staticamente, come HTML, client asincronicamente, come js chunks)
 --- SOLIDJS client caricato appena possibile (client:load directive)
