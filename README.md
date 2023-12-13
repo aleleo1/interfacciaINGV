@@ -6,14 +6,18 @@ Folders and files:
 ```text
 /
 ├── public/
-│   └── * public assets like images*
+│   └── * public assets like images, logos*
 ├── src/
 │   ├── components/
 │   │   └── * Solid js components *
+|             └── charts/
+│               └── * various charts (barplot, pieplot), import from index.ts *
 │   ├── layouts/
 │   │   └── * Project's main layout *
 │   └── pages/
 │       └── * index.astro as only main page *
+|           └── api (TOBE)/
+│                └── * API functions *
 └── package.json
 ```
 

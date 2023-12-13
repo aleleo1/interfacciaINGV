@@ -1,14 +1,6 @@
 import * as d3 from "d3"
 import { For, Show, createEffect, createSignal } from "solid-js"
-
-type ChartProps<T extends Record<string, any>> = {
-    width: number
-    height: number
-    margin: number
-    data: T[]
-    label: keyof T
-    value: (d: T) => number
-}
+import type { PieChartProps as ChartProps } from "../context/context.types"
 
 export default function TestChart2<T extends Record<string, any>>(p: ChartProps<T>) {
     const [arcs, setArcs] = createSignal<Arc<T>[]>([])

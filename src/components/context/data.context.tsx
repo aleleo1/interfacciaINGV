@@ -11,7 +11,7 @@ const elaborate = (res: any) => (Object.entries(
   )
 ).map(
   ([postId, comments]) => ({ postId: postId, comments })
-).slice(0, 50))
+).slice(0, Math.floor(Math.random() * 100)))
 const fetchDataSource1 = async () => (await d3.json('https://jsonplaceholder.typicode.com/comments'))
 const DataContext = createContext<Provider>();
 

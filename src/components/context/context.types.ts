@@ -1,5 +1,5 @@
 import type { Resource, Signal } from "solid-js";
-
+/* ******************** DATA TYPES */
 type DataType = any; // Replace with the actual type
 type ElaborationType = any; // Replace with the actual type
 
@@ -42,3 +42,21 @@ interface ProviderFunctions {
 }
 
 export interface Provider extends PropsProvider, ProviderFunctions{}
+
+
+/* ******************** CHART TYPES */
+export type BarChartProps<T extends Record<string, any>> = {
+    width: number
+    height: number
+    margin: number
+    data: T[]
+}
+
+export type PieChartProps<T extends Record<string, any>> = {
+    width: number
+    height: number
+    margin: number
+    data: T[]
+    label: keyof T
+    value: (d: T) => number
+}

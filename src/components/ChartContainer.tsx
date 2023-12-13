@@ -1,6 +1,7 @@
 import { Match, Show, Switch, createEffect, createResource, on, createSignal } from "solid-js";
 import { lazyImports } from "./utils";
-import { useData } from "./data.context";
+import { useData } from "./context/data.context";
+import { BasicSpinner } from "./components.utils";
 const [PieChart, BarChart] = lazyImports('PieChart', 'BarChart')
 
 
@@ -13,12 +14,12 @@ export function Container(props: any) {
         [pieW, setPieW] = createSignal(100),
         [pieH, setPieH] = createSignal(100);
     return (
-        <div class="flex flex-col p-20 w-full">
+        <div class="flex flex-col p-20 w-full justify-center items-center">
 
             <Show when={props.type === 'BAR'}>
                 <Show
                     when={!dataSource.loading}
-                    fallback={<div>Loading data.....</div>}
+                    fallback={<BasicSpinner />}
                 >
                     <div class="flex flex-col items-center justify-center">
                         <div class="flex flex-row gap-x-20">
@@ -40,7 +41,7 @@ export function Container(props: any) {
             <Show when={props.type === 'PIE'}>
                 <Show
                     when={!dataSource.loading}
-                    fallback={<div>Loading data.....</div>}
+                    fallback={<BasicSpinner />}
                 >
                     <button onClick={() => refetch()}>REFETCH</button>
                     <PieChart
