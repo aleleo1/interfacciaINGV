@@ -4,9 +4,7 @@ type DataType = any; // Replace with the actual type
 type ElaborationType = any; // Replace with the actual type
 
 export interface Functions {
-    mutate: () => void;
-    refetch: () => void;
-    elaboration: () => ElaborationType;
+    [key:string]: () => void | ElaborationType;
 }
 
 export interface Signals {
@@ -73,4 +71,9 @@ export type PieChartProps<T extends Record<string, any>> = {
     data: T[]
     label: keyof T
     value: (d: T) => number
+}
+
+export type ContainerProps<T extends Record<string, any>>= {
+    chartType: string
+
 }

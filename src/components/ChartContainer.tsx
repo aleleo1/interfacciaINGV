@@ -5,7 +5,7 @@ import { BasicSpinner } from "./components.utils";
 const [PieChart, BarChart, LollipopChart, BaseChart] = lazyImports('PieChart', 'BarChartV2', 'LollipopChart', 'BaseChart')
 
 
-export function Container(props: any) {
+export default function Container(props: any) {
     const data = useData()
     const { dataSource } = data!.getR()
     const { refetch, elaboration } = data!.getF();
