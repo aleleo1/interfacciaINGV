@@ -8,7 +8,7 @@ import node from "@astrojs/node";
 export default defineConfig({
   site: 'https://aleleo1.github.io',
   base: '/interfacciaINGV',
-  output: "hybrid",
+  output: "server",
   integrations: [solidJs(), tailwind()],
   adapter: node({
     mode: "standalone"

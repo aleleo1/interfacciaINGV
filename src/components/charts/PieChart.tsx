@@ -31,7 +31,7 @@ export default function TestChart2<T extends Record<string, any>>(p: ChartProps<
         )
     })
     return (
-        <div>
+        <div class="w-full">
             <svg viewBox={`0 0 ${p.width} ${p.height}`}>
                 <g transform={`translate(${p.width / 2},${p.height / 2})`}>
                     <For each={arcs()}>

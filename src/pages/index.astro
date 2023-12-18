@@ -1,11 +1,12 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import SolidIndex from '../components/Index'
+import Layout from "../layouts/Layout.astro";
+import SolidIndex from "../components/Index";
+export const prerender = true;
 ---
 
 <Layout title="Tesi IGNV">
 	<main>
-		<SolidIndex client:load></SolidIndex>
+		<SolidIndex client:load />
 	</main>
 </Layout>
 
@@ -19,5 +20,4 @@ import SolidIndex from '../components/Index'
 		font-size: 20px;
 		line-height: 1.6;
 	}
-
 </style>

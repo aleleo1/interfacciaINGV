@@ -2,12 +2,12 @@ import { Match, Show, Switch, createEffect, createResource, on, createSignal } f
 import { lazyImports } from "./utils";
 import { useData } from "./context/data.context";
 import { BasicSpinner } from "./components.utils";
-const [PieChart, BarChart] = lazyImports('PieChart', 'BarChart')
+const [PieChart, BarChart, LollipopChart] = lazyImports('PieChart', 'BarChart', 'LollipopChart')
 
 
 export function Container(props: any) {
     const data = useData()
-    const {dataSource} = data!.getR()
+    const { dataSource } = data!.getR()
     const { refetch, elaboration } = data!.getF();
     const [barW, setBarW] = createSignal(900),
         [barH, setBarH] = createSignal(450),
@@ -27,8 +27,6 @@ export function Container(props: any) {
                             <button onClick={() => { setBarW(barW() + 50); setBarH(barH() + 50); }}>AUMENTA W-H</button>
                             <button onClick={() => { setBarW(barW() - 50); setBarH(barH() - 50) }}>DIMINUISCI W-H</button>
                         </div>
-                        {/* <input type="text" placeholder="set width" class="text-black" onchange={(event) => setBarW(event.target.value)} />
-                        <input type="text" placeholder="set heigh" class="text-black" onchange={(event) => setBarH(event.target.value)} /> */}
                         <BarChart
                             width={barW()}
                             height={barH()}
