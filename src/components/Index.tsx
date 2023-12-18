@@ -6,7 +6,7 @@ export default function Index() {
     return (
         <DataProvider>
             <Container type="BAR" />
-            <Container type="PIE" />
+            {/* <Container type="PIE" /> */}
             {/* <Container type="LINE" /> */}
         </DataProvider>
     )
