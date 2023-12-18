@@ -19,3 +19,14 @@ export const BasicSpinner = (p: { svg?: boolean }) => {
     </Show>
   )
 }
+
+
+export const BasicError = (p: { msg?: string }) => {
+  return (
+    <Show when={!p.msg}
+      fallback={
+        <p>Errore di caricamento</p>} >
+      <p>{p.msg}</p>
+    </Show>
+  )
+}

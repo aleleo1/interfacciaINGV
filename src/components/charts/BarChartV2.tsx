@@ -3,11 +3,10 @@ import BaseChart from './BaseXYChart'
 import * as d3 from 'd3';
 import { createStore } from 'solid-js/store';
 import type { BarChartProps as ChartProps } from '../context/context.types';
-import { BasicSpinner } from '../components.utils';
+import { BasicSpinner, BasicError } from '../components.utils';
 import { useData } from '../context/data.context';
 type D3Data = { x: number; y: number; width: number; height: number; color: any; id: number }
 type MockedData = Partial<D3Data & { x: number; y: number }>
-const DELTA_HY = 20
 
 export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>) {
     const { dataSource } = useData()!.getR()
@@ -65,19 +64,25 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
                     when={!dataSource.loading}
                     fallback={<BasicSpinner svg={true} />}
                 >
-                    <For each={bars}>
-                        {bar => (
-                            <rect
-                                x={bar.x}
-                                y={bar.y}
-                                width={bar.width}
-                                height={bar.height}
-                                fill={bar.color}
-                                onMouseOver={() => handleMouseOver(bar)}
-                                onMouseOut={() => handleMouseOut(bar)}
-                            />
-                        )}
-                    </For>
+                    <Show
+                        when={!dataSource.error}
+                        fallback={<BasicError msg='Impossibile caricare il grafico' />}
+                    >
+
+                        <For each={bars}>
+                            {bar => (
+                                <rect
+                                    x={bar.x}
+                                    y={bar.y}
+                                    width={bar.width}
+                                    height={bar.height}
+                                    fill={bar.color}
+                                    onMouseOver={() => handleMouseOver(bar)}
+                                    onMouseOut={() => handleMouseOut(bar)}
+                                />
+                            )}
+                        </For>
+                    </Show>
                 </Show>
             </BaseChart>
             <Show
