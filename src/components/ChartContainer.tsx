@@ -11,8 +11,8 @@ export function Container(props: any) {
     const { refetch, elaboration } = data!.getF();
     const [barW, setBarW] = createSignal(900),
         [barH, setBarH] = createSignal(450),
-        [pieW, setPieW] = createSignal(100),
-        [pieH, setPieH] = createSignal(100);
+        [pieW, setPieW] = createSignal(110),
+        [pieH, setPieH] = createSignal(110);
     return (
         <div class="flex flex-col p-20 w-full justify-center items-center">
 
