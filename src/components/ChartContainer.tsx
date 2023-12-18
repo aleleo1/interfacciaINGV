@@ -2,7 +2,7 @@ import { Match, Show, Switch, createEffect, createResource, on, createSignal } f
 import { lazyImports } from "./utils";
 import { useData } from "./context/data.context";
 import { BasicSpinner } from "./components.utils";
-const [PieChart, BarChart, LollipopChart] = lazyImports('PieChart', 'BarChart', 'LollipopChart')
+const [PieChart, BarChart, LollipopChart, BaseChart] = lazyImports('PieChart', 'BarChartV2', 'LollipopChart', 'BaseChart')
 
 
 export function Container(props: any) {
@@ -17,24 +17,19 @@ export function Container(props: any) {
         <div class="flex flex-col p-20 w-full justify-center items-center">
 
             <Show when={props.type === 'BAR'}>
-                <Show
-                    when={!dataSource.loading}
-                    fallback={<BasicSpinner />}
-                >
-                    <div class="flex flex-col items-center justify-center">
-                        <div class="flex flex-row gap-x-20">
-                            <button onClick={() => refetch()}>REFETCH</button>
-                            <button onClick={() => { setBarW(barW() + 50); setBarH(barH() + 50); }}>AUMENTA W-H</button>
-                            <button onClick={() => { setBarW(barW() - 50); setBarH(barH() - 50) }}>DIMINUISCI W-H</button>
-                        </div>
-                        <BarChart
-                            width={barW()}
-                            height={barH()}
-                            margin={10}
-                            data={elaboration()!}
-                        />
+                <div class="flex flex-col items-center justify-center">
+                    <div class="flex flex-row gap-x-20">
+                        <button onClick={() => refetch()}>REFETCH</button>
+                        <button onClick={() => { setBarW(barW() + 50); setBarH(barH() + 50); }}>AUMENTA W-H</button>
+                        <button onClick={() => { setBarW(barW() - 50); setBarH(barH() - 50) }}>DIMINUISCI W-H</button>
                     </div>
-                </Show>
+                    <BarChart
+                        width={barW()}
+                        height={barH()}
+                        margin={10}
+                        data={elaboration()!}
+                    />
+                </div>
             </Show>
             <Show when={props.type === 'PIE'}>
                 <Show

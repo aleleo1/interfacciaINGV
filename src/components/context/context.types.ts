@@ -45,12 +45,26 @@ export interface Provider extends PropsProvider, ProviderFunctions{}
 
 
 /* ******************** CHART TYPES */
-export type BarChartProps<T extends Record<string, any>> = {
+
+
+/* ***************BAR CHART */
+type xy = {
+    x: d3.ScaleLinear<number, number, never>
+    y: d3.ScaleLinear<number, number, never>
+}
+type Margins = {
+    mb: number
+    mt: number,
+    ml: number,
+    mr: number
+
+} 
+export type BarChartProps<T extends Record<string, any>>= {
     width: number
     height: number
     margin: number
     data: T[]
-}
+} & Margins & Partial<xy>
 
 export type PieChartProps<T extends Record<string, any>> = {
     width: number

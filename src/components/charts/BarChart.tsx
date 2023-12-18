@@ -23,8 +23,8 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
                     .domain([0, p.data.length])
                 setBars(
                     p.data.map((d, i) => ({
-                        x: xScale()(d.postId),
-                        y: yScale()(d.comments),
+                        x: xScale()(d.x),
+                        y: yScale()(d.y),
                         width: barWidth(),
                         height: height - yScale()(d.comments),
                         postId: d.postId,
@@ -44,8 +44,8 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
         width = p.width - margin.left - margin.right,
         height = p.height - margin.top - margin.bottom
     const [bars, setBars] = createStore<MockedData[]>([]);
-    const xScale = () => (d3.scaleBand().range([0, width]).padding(0.5).domain(p.data.map(d => d.postId)))
-    const yScale = () => (d3.scaleLinear().range([height, 0]).domain([0, d3.max(p.data, d => d.comments) * 1.1]))
+    const xScale = () => (d3.scaleBand().range([0, width]).padding(0.5).domain([...p.data.map(d => d.postId)]))
+    const yScale = () => (d3.scaleLinear().range([height, 0]).domain([0, d3.max(p.data, d => d.comments) * 1.2]))
     const barWidth = () => (xScale().bandwidth())
     const font_size = () => (Math.floor(barWidth() - 2))
     const [svg, setSvg] = createSignal<SVGSVGElement | null>(null);

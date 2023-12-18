@@ -10,12 +10,12 @@ const elaborate = (res: any) => (Object.entries(
     }, {}
   )
 ).map(
-  ([postId, comments]) => ({ x: postId, y : comments })
+  ([postId, comments]) => ({ postId: postId, comments })
 ).slice(0, Math.floor(Math.random() * 100)))
 const fetchDataSource1 = async () => (await d3.json('https://jsonplaceholder.typicode.com/comments'))
 const DataContext = createContext<Provider>();
 
-export function DataProvider(props: any) {
+export function ChartProvider(props: any) {
 
   const [dataSource, { mutate, refetch }] = createResource(fetchDataSource1, { initialValue: [] });
   const elaboration = createMemo(() => (elaborate(dataSource())))
