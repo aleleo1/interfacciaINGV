@@ -38,6 +38,9 @@ All commands are run from the root of the project, from a terminal:
 L'applicazione mostra una demo di 2 grafici rappresentanti dati random caricati da https://jsonplaceholder.typicode.com/comments,
 simulando la velocità di SolidJS nel rappresentare un'insieme di dati nell'UI.
 
+## Deploy
+Deploy temporaneo su Vercel: interfaccia-ingv.vercel.app
+
 Sfrutto inoltre le strategie di rendering di AstroJS per caricare i dati con la maggior efficenza possibile.
 Impostazione attuale:
 --- Hybrid (islands, pagina caricata staticamente, come HTML, client asincronicamente, come js chunks)
