@@ -1,7 +1,4 @@
- Sample workflow for building and deploying an Astro site to GitHub Pages
-#
-# To get started with Astro see: https://docs.astro.build/en/getting-started/
-#
+
 name: Deploy Astro site to Pages
 
 on:
@@ -33,9 +30,9 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v4
-        name: Detect package manager
+      - name: Detect package manager
         id: detect-package-manager
         run: |
           if [ -f "${{ github.workspace }}/yarn.lock" ]; then
@@ -52,25 +49,25 @@ jobs:
             echo "Unable to determine package manager"
             exit 1
           fi
-        name: Setup Node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
           cache-dependency-path: ${{ env.BUILD_PATH }}/package-lock.json
-        name: Setup Pages
+      - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
-        name: Install dependencies
+      - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
         working-directory: ${{ env.BUILD_PATH }}
-        name: Build with Astro
+      - name: Build with Astro
         run: |
           ${{ steps.detect-package-manager.outputs.runner }} astro build \
             --site "${{ steps.pages.outputs.origin }}" \
             --base "${{ steps.pages.outputs.base_path }}"
         working-directory: ${{ env.BUILD_PATH }}
-        name: Upload artifact
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
           path: ${{ env.BUILD_PATH }}/dist
@@ -83,6 +80,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy
     steps:
-        name: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v3
