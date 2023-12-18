@@ -23,3 +23,6 @@ pnpm-debug.log*
 #git
 .git/*
 !.git/workflows
+
+#data mock
+localdata/
