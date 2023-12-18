@@ -8,7 +8,7 @@ export interface Functions {
 }
 
 export interface Signals {
-    [key: string]: Signal<any> | Resource<any>;
+    [key: string]: Signal<any>;
 }
 
 export interface Resources {

@@ -1,13 +1,18 @@
+import { DataProviderV2 } from "./context/data.context.v2";
 import { DataProvider } from "./context/data.context";
-import { Container } from "./ChartContainer";
-
+import ChartContainer from "./ChartContainer";
+import Container from './container'
+import Test from "./charts/TestForNanostores";
 export default function Index() {
 
     return (
         <DataProvider>
-            <Container type="BAR" />
-            {/* <Container type="PIE" /> */}
-            {/* <Container type="LINE" /> */}
+            <DataProviderV2>
+                <Test />
+                <Container chartType="BAR" />
+                {/* <Container type="PIE" /> */}
+                {/* <Container type="LINE" /> */}
+            </DataProviderV2>
         </DataProvider>
     )
 }
