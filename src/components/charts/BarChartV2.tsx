@@ -1,26 +1,28 @@
-import { createSignal, createEffect, For, on, Show, createResource } from 'solid-js';
+import { createSignal, createEffect, For, Show } from 'solid-js';
 import BaseChart from './BaseXYChart'
 import * as d3 from 'd3';
 import { createStore } from 'solid-js/store';
 import type { BarChartProps as ChartProps } from '../context/context.types';
+import { useData } from '../context/data.context.v2';
+import * as C from '../constants'
 import { BasicSpinner, BasicError } from '../components.utils';
-import { useData } from '../context/data.context';
+
 type D3Data = { x: number; y: number; width: number; height: number; color: any; id: number }
 type MockedData = Partial<D3Data & { x: number; y: number }>
 
 export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>) {
-    const { dataSource } = useData()!.getR()
     const [bars, setBars] = createStore<MockedData[]>([]);
-
+    const { data } = useData()!.stores
+    const { loaded, error } = useData()!.signals
+    
     const marginTop = 20;
     const marginRight = 20;
     const marginBottom = 30;
     const marginLeft = 40;
     const margins = { mt: marginTop, mb: marginBottom, ml: marginLeft, mr: marginRight }
-
-    const x = () => (d3.scaleLinear([0, p.data.length * 1.2], [marginLeft, p.width - marginRight]));
-    const y = () => (d3.scaleLinear().range([p.height - marginBottom, 0]).domain([0, d3.max(p.data, d => d.y) * 1.2]))
-    const xScale = () => (d3.scaleBand().range([marginLeft, p.width - marginRight]).padding(0.8).domain(p.data.map(d => d.x)))
+    const x = () => (d3.scaleLinear([0, data.length * 1.2], [marginLeft, p.width - marginRight]));
+    const y = () => (d3.scaleLinear().range([p.height - marginBottom, 0]).domain([0, d3.max(data, d => d.y) * 1.2]))
+    const xScale = () => (d3.scaleBand().range([marginLeft, p.width - marginRight]).padding(0.8).domain(data.map(d => d.x)))
     const barWidth = () => (xScale().bandwidth())
 
 
@@ -39,35 +41,30 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
 
     createEffect(() => {
         console.log('****LOADING SVG RESOURCE')
-        const colorGenerator = d3
-            .scaleSequential(d3.interpolateWarm)
-            .domain([0, p.data.length])
-        setBars(
-            p.data.map((d, i) => ({
-                x: x()(d.x) - Math.floor(barWidth() / 2),
-                y: y()(d.y),
-                width: barWidth(),
-                height: p.height - y()(d.y) - marginBottom,
-                xlabel: d.x,
-                ylabel: d.y,
-                color: colorGenerator(i),
-                id: i
-            }))
-        );
+        if (data.length > 0) {
+            const colorGenerator = d3
+                .scaleSequential(d3.interpolateWarm)
+                .domain([0, data.length])
+            setBars(
+                data.map((d, i) => ({
+                    x: x()(d.x) - Math.floor(barWidth() / 2),
+                    y: y()(d.y),
+                    width: barWidth(),
+                    height: p.height - y()(d.y) - marginBottom,
+                    xlabel: d.x,
+                    ylabel: d.y,
+                    color: colorGenerator(i),
+                    id: i
+                }))
+            );
+        }
     })
 
 
     return (
-        <>
-            <BaseChart {...Object.assign({}, p, margins, { x: x(), y: y() })} >
-                <Show
-                    when={!dataSource.loading}
-                    fallback={<BasicSpinner svg={true} />}
-                >
-                    <Show
-                        when={!dataSource.error}
-                        fallback={<BasicError msg='Impossibile caricare il grafico' />}
-                    >
+        <div>
+            
+                    <BaseChart {...Object.assign({}, p, margins, { x: x(), y: y() })} >
 
                         <For each={bars}>
                             {bar => (
@@ -82,9 +79,9 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
                                 />
                             )}
                         </For>
-                    </Show>
-                </Show>
-            </BaseChart>
+
+                    </BaseChart>
+               
             <Show
                 when={hovered()}
                 fallback={<div class="p-3">...</div>}
@@ -103,8 +100,9 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
                     </div>
                 )}
             </Show>
-        </>
 
 
+
+        </div>
     );
 }

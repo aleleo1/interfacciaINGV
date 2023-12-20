@@ -1,14 +1,12 @@
-import { createSignal, createEffect, For, on, Show, createResource } from 'solid-js';
+import { createSignal, createEffect, Show, on } from 'solid-js';
 import * as d3 from 'd3';
-import { createStore } from 'solid-js/store';
 import type { BarChartProps as ChartProps } from '../context/context.types';
-
-type D3Data = { x: number; y: number; width: number; height: number; color: any; id: number }
+import { useData } from '../context/data.context.v2';
+import { BasicError, BasicSpinner } from '../components.utils';
+import * as C from '../constants'
 
 export default function BaseChart<T extends Record<string, any>>(p: ChartProps<T>) {
-
-
-
+    const {loaded, error} = useData()!.signals
     const [svg, setSvg] = createSignal<SVGSVGElement | null>(null);
     const [gx, setGx] = createSignal<SVGGElement | null>(null)
     const [gy, setGy] = createSignal<SVGGElement | null>(null)
@@ -16,7 +14,7 @@ export default function BaseChart<T extends Record<string, any>>(p: ChartProps<T
     const xAxis = () => d3.axisBottom(p.x)
     const yAxis = () => d3.axisLeft(p.y)
 
-    createEffect(() => { d3.select(gx()).call(xAxis()); d3.select(gy()).call(yAxis()) })
+    createEffect(on(svg, () => { d3.select(gx()).call(xAxis()); d3.select(gy()).call(yAxis()) }))
 
     return (
         <div class='w-fit'>
@@ -30,7 +28,9 @@ export default function BaseChart<T extends Record<string, any>>(p: ChartProps<T
                 </g>
                 <g ref={setGy} fill="none" font-size="10" font-family="sans-serif" text-anchor="end" transform={`translate(${p.ml},0)`}>
                 </g>
-                {p.children}
+
+                        {p.children}
+                   
             </svg>
 
 

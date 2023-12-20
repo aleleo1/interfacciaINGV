@@ -1,53 +1,68 @@
-import { Match, Show, Switch, createEffect, createResource, on, createSignal } from "solid-js";
+import { Show, createSignal } from "solid-js";
 import { lazyImports } from "./utils";
-import { useData } from "./context/data.context";
-import { BasicSpinner } from "./components.utils";
-const [PieChart, BarChart, LollipopChart, BaseChart] = lazyImports('PieChart', 'BarChartV2', 'LollipopChart', 'BaseChart')
+import { useData } from "./context/data.context.v2";
+import * as C from './constants'
+import { BasicSpinner, BasicError } from "./components.utils";
+const [BarChart] = lazyImports('BarChartV2')
 
 
 export default function Container(props: any) {
-    const data = useData()
-    const { dataSource } = data!.getR()
-    const { refetch, elaboration } = data!.getF();
-    const [barW, setBarW] = createSignal(900),
-        [barH, setBarH] = createSignal(450),
-        [pieW, setPieW] = createSignal(110),
-        [pieH, setPieH] = createSignal(110);
+    const dataP = useData()!
+
+    const images = useData()!.images
+    const { loaded, error, imgS } = useData()!.signals
+    const [img, setImg] = imgS
+    const { refetch } = dataP.functions;
+    const [barW, setBarW] = createSignal(C.DBW),
+        [barH, setBarH] = createSignal(C.DBH),
+        [pieW, setPieW] = createSignal(C.PIEW),
+        [pieH, setPieH] = createSignal(C.PIEH);
     return (
-        <div class="flex flex-col p-20 w-full justify-center items-center">
 
-            <Show when={props.type === 'BAR'}>
-                <div class="flex flex-col items-center justify-center">
-                    <div class="flex flex-row gap-x-20">
-                        <button onClick={() => refetch()}>REFETCH</button>
-                        <button onClick={() => { setBarW(barW() + 50); setBarH(barH() + 50); }}>AUMENTA W-H</button>
-                        <button onClick={() => { setBarW(barW() - 50); setBarH(barH() - 50) }}>DIMINUISCI W-H</button>
-                    </div>
-                    <BarChart
-                        width={barW()}
-                        height={barH()}
-                        margin={10}
-                        data={elaboration()!}
-                    />
-                </div>
-            </Show>
-            <Show when={props.type === 'PIE'}>
+        <><button onclick={() => { img()!.src = images.test2.src; refetch() }}>CAMBIA IMMAGINE</button>
+            <img
+                ref={setImg}
+                src={images.test1.src}
+                width="350"
+                height="350"
+                alt="immagine"
+            />
+            <Show
+                when={loaded[0]()}
+                fallback={<BasicSpinner svg={true} />}
+            >
                 <Show
-                    when={!dataSource.loading}
-                    fallback={<BasicSpinner />}
+                    when={!error[0]()}
+                    fallback={<BasicError msg='Impossibile caricare il grafico' />}
                 >
-                    <button onClick={() => refetch()}>REFETCH</button>
-                    <PieChart
-                        width={pieW()}
-                        height={pieH()}
-                        margin={10}
-                        data={elaboration()!}
-                        label="postId"
-                        value={(d: any) => d.comments as number}
-                    />
-                </Show>
-            </Show>
-        </div>
 
+                    <Show when={props.type === 'BAR'}>
+                        <BarChart
+                            width={barW()}
+                            height={barH()}
+                            margin={10}
+                        />
+                    </Show>
+
+                    {/* <Show when={props.type === 'PIE'}>
+                    <Show
+                        when={!dataSource.loading}
+                        fallback={<BasicSpinner />}
+                    >
+                        <button onClick={() => refetch()}>REFETCH</button>
+                        <PieChart
+                            width={pieW()}
+                            height={pieH()}
+                            margin={10}
+                            data={elaboration()!}
+                            label="postId"
+                            value={(d: any) => d.comments as number}
+                        />
+                    </Show>
+                </Show> */}
+                </Show>
+            </Show >
+
+        </>
     )
 }

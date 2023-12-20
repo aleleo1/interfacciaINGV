@@ -1,12 +1,27 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import SolidIndex from "../components/Index";
+import Container from "../components/container";
+import { Image } from "astro:assets";
+import test from "../assets/test.jpg";
+import * as C from "../components/constants";
 ---
 
 <Layout title="Tesi INGV">
-	<main>
-		<SolidIndex client:load />
+	<main class="flex flex-col justify-center items-center gap-y-20">
+		<div
+			class="w-screen h-fit flex flex-row gap-x-10 justify-evenly items-center p-10"
+		>
+			
+			<Container chartType="BAR" client:load />
+		</div>
+		<div
+			class="w-screen h-fit flex flex-row gap-x-10 justify-evenly items-center p-10"
+		>
+			<Container chartType="BAR" client:load />
+		</div>
 	</main>
+	<!-- <Container chartType="PIE" client:load/> -->
 </Layout>
 
 <style>

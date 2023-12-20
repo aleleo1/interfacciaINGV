@@ -2,7 +2,7 @@ import type { Signal } from 'solid-js';
 import type {Provider as P, Signals, Resources, Functions} from './context.types'
 
 export class Provider implements P {
-    constructor(signals: Signals, resources: Resources, functions: Functions, ...args: any[]) {
+    constructor(signals: Signals, resources: Resources, functions: Functions) {
         this.setS(signals);
         this.setF(functions);
         this.setR(resources);

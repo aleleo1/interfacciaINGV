@@ -6,13 +6,13 @@ import Test from "./charts/TestForNanostores";
 export default function Index() {
 
     return (
-        <DataProvider>
-            <DataProviderV2>
-                <Test />
-                <Container chartType="BAR" />
-                {/* <Container type="PIE" /> */}
-                {/* <Container type="LINE" /> */}
-            </DataProviderV2>
-        </DataProvider>
+
+        <DataProviderV2>
+            <Test />
+           {/*  <Container chartType="BAR" />
+            <Container chartType="PIE" /> */}
+            {/* <Container type="LINE" /> */}
+        </DataProviderV2>
+
     )
 }

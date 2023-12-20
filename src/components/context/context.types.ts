@@ -15,7 +15,7 @@ export interface Resources {
     [key: string]: Resource<any>;
 }
 
-interface PropsProvider {
+export interface PropsProvider {
     signals: Signals;
     functions: Functions;
     resources: Resources;
@@ -61,7 +61,6 @@ export type BarChartProps<T extends Record<string, any>>= {
     width: number
     height: number
     margin: number
-    data: T[]
 } & Margins & Partial<xy>
 
 export type PieChartProps<T extends Record<string, any>> = {

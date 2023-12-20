@@ -1,36 +1,37 @@
 import { useStore } from '@nanostores/solid';
-import { $test } from '../../store';
-import { createContext, createEffect, createMemo, createSignal, useContext } from "solid-js";
-import type { Functions, Resources, Signals } from "./context.types";
-import { Provider } from './context.model'
-
-/* const elaborate = (res: any) => (Object.entries(
-    res.reduce(
-        (acc: any, curr: any) => {
-            acc[curr.postId] = Math.round(Math.random() * 100)
-            return acc
-        }, {}
-    )
-).map(
-    ([postId, comments]) => ({ x: postId, y: comments })
-).slice(0, Math.floor(Math.random() * 100))) */
-/* const fetchDataSource1 = async () => (await d3.json('https://jsonplaceholder.typicode.com/comments')) */
-const DataContext = createContext<Provider>();
+import { $test, $fetchDataSource1, elaborate } from '../../store';
+import { createContext, createEffect, createMemo, createResource, createSignal, useContext } from "solid-js";
+import type { Functions, PropsProvider, Resources, Signals } from "./context.types";
+import { createStore } from 'solid-js/store';
+import test1 from "../../assets/test.jpg";
+import test2 from "../../assets/test2.jpg";
+const DataContext = createContext<PropsProvider & { stores: any, images: ImageMetadata }>();
 
 export function DataProviderV2(props: any) {
+    //TEST SIGNAL FOR FILTERS
     const setTestF = (val: number) => ($test.set(val))
-    /*     const elaboration = createMemo(() => (elaborate($dataSource()))) */
     const test = createSignal($test.get())
+    const [testS, setTest] = test
     createEffect(() => {
-        setTestF(test[0]())
+        setTestF(testS())
     })
 
-
-    const signals: Signals = { test }
-    const resources: Resources = {}
-    const functions: Functions = {}
-
-    const provider = new Provider(signals, resources, functions)
+    const [dataSource, { mutate, refetch }] = createResource($fetchDataSource1, { initialValue: [] });
+    const loaded = createSignal(false)
+    const error = createSignal(false)
+    const [loadedg, setLoaded] = loaded
+    const [errorg, setError] = error
+    const imgS = createSignal<HTMLImageElement | null>(null)
+    createEffect(() => setLoaded(!dataSource.loading))
+    createEffect(() => setError(dataSource.error))
+    const [data, setData] = createStore<any>([])
+    createEffect(() => { setData([...elaborate(dataSource())]) })
+    const signals: Signals = { test, loaded, error, imgS }
+    const resources: Resources = { dataSource }
+    const functions: Functions = { mutate, refetch }
+    const stores = { data }
+    const images = { test1, test2 }
+    const provider: PropsProvider & { stores: { [key: string]: any }, images: { [key: string]: ImageMetadata } } = { signals, resources, functions, stores, images }
 
     return (
 
