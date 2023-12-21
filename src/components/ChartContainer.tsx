@@ -27,10 +27,9 @@ export default function Container(props: any) {
         <>
 
             <button onclick={() => { addImg(); refetch(); }}>CAMBIA IMMAGINE</button>
-            <Show when={!imgLoaded() || !img()}><BasicSpinner /></Show>
+            <Show when={!img()}><BasicSpinner /></Show>
             <img
                 onload={handleImgLoad}
-                style={`display: ${imgLoaded() ? 'block' : 'none'}`}
                 ref={setImg}
                 src={image().src}
                 width={image().width}
