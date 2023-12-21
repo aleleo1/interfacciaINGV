@@ -1,4 +1,4 @@
-import { Show, createSignal } from "solid-js";
+import { Show, createEffect, createSignal } from "solid-js";
 import { lazyImports } from "./utils";
 import { useData } from "./context/data.context.v2";
 import * as C from './constants'
@@ -17,6 +17,8 @@ export default function Container(props: any) {
     const handleImgLoad = () => {
         setImgLoaded(true)
     }
+    createEffect(()=>{setImgLoaded(!!img())})
+    createEffect(()=>{console.log('img loaded: ', imgLoaded(), !!img())})
     const { refetch, addImg } = dataP.functions;
     const [barW, setBarW] = createSignal(C.DBW),
         [barH, setBarH] = createSignal(C.DBH),
@@ -27,7 +29,7 @@ export default function Container(props: any) {
         <>
 
             <button onclick={() => { addImg(); refetch(); }}>CAMBIA IMMAGINE</button>
-            <Show when={!img()}><BasicSpinner /></Show>
+            <Show when={!!!img()}><BasicSpinner /></Show>
             <img
                 onload={handleImgLoad}
                 ref={setImg}
