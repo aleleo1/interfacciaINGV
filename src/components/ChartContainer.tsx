@@ -12,7 +12,7 @@ export default function Container(props: any) {
     const { image } = useData()!.images
 
     const { loaded, error, imgRef } = useData()!.signals
-    const [, setImg] = imgRef
+    const [img, setImg] = imgRef
     const [imgLoaded, setImgLoaded] = createSignal(false)
     const handleImgLoad = () => {
         setImgLoaded(true)
@@ -27,7 +27,7 @@ export default function Container(props: any) {
         <>
 
             <button onclick={() => { addImg(); refetch(); }}>CAMBIA IMMAGINE</button>
-            <Show when={!imgLoaded()}><BasicSpinner /></Show>
+            <Show when={!imgLoaded() || !img()}><BasicSpinner /></Show>
             <img
                 onload={handleImgLoad}
                 style={`display: ${imgLoaded() ? 'block' : 'none'}`}
