@@ -50,18 +50,17 @@ export function DataProviderV2(props: any) {
     const navigateImgSrc = () => (IMAGES_SRCS.at(imagesIndex() + 1 < IMAGES_SRCS.length ? imagesIndex() + 1 : 0))!
     const createImage = (src: string) => ({ src, width: 350, height: 350, format: 'jpg' })
     const image = () => imageStore[0].at(imagesIndex())
-    const isImageThere = (src: string) => (imageStore[0].findIndex((elem) => (elem.src === src)))
-    const isImage = () => !!image() && !image()!.empty
+    const isImageThere = (src: string) => (imageStore[0].findIndex((elem) => (elem.src && elem.src === src)))
     const addImg =
-        () => (isImageThere(navigateImgSrc()) >= 0 ?
+        () => {
+            if (isImageThere(navigateImgSrc()) < 0) {
+                imageStore[1]
+                    ([...imageStore[0], createImage(navigateImgSrc())])
+            }
             setImagesIndex(
                 isImageThere(navigateImgSrc())
             )
-            : imageStore[1]
-            ( [...imageStore[0], createImage(navigateImgSrc())])
-                    
-                
-        )
+        }
 
 
     //IMAGES
@@ -73,13 +72,11 @@ export function DataProviderV2(props: any) {
     createEffect(() => setError(dataSource.error))
     createEffect(() => { setData([...elaborate(dataSource())]) })
 
-    createEffect(() => { console.log(isImage(), image(), imageStore[0], IMAGES_SRCS) })
-
-
+    createEffect(() => { console.log(imagesIndex(), isImageThere(navigateImgSrc())) })
 
     const signals: Signals = { test, loaded, error, imgRef }
     const resources: Resources = { dataSource }
-    const functions: Functions = { mutate, refetch, isImage, addImg }
+    const functions: Functions = { mutate, refetch, addImg }
     const stores = { data }
     const images = { image }
 

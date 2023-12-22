@@ -95,7 +95,7 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
                             }}
                         />
                         <span>
-                            PostID: {item().xlabel} con {item().ylabel} commenti
+                            X: {item().xlabel}; Y: {item().ylabel}
                         </span>
                     </div>
                 )}

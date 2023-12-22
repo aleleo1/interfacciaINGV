@@ -1,4 +1,4 @@
-import { Show, createEffect, createSignal } from "solid-js";
+import { Show, createEffect, createSignal, on } from "solid-js";
 import { lazyImports } from "./utils";
 import { useData } from "./context/data.context.v2";
 import * as C from './constants'
@@ -12,13 +12,23 @@ export default function Container(props: any) {
     const { image } = useData()!.images
 
     const { loaded, error, imgRef } = useData()!.signals
-    const [img, setImg] = imgRef
+    /* const [img, setImg] = imgRef */
     const [imgLoaded, setImgLoaded] = createSignal(false)
     const handleImgLoad = () => {
         setImgLoaded(true)
     }
-    createEffect(()=>{setImgLoaded(!!img())})
-    createEffect(()=>{console.log('img loaded: ', imgLoaded(), !!img())})
+    const [img, ] = createSignal<HTMLImageElement | any>(<img />)
+    createEffect(on(image, ()=>{
+        if(!img().src || image().src !== img().src){
+            img().src = image().src
+            img().alt = 'immagine'
+            img().width = image().width
+            img().height = image().height
+            img().onload = () =>{setImgLoaded(true)}
+            img().onerror = () =>(setImgLoaded(false))
+        }
+    }))
+    createEffect(()=>{console.log(image())})
     const { refetch, addImg } = dataP.functions;
     const [barW, setBarW] = createSignal(C.DBW),
         [barH, setBarH] = createSignal(C.DBH),
@@ -29,15 +39,8 @@ export default function Container(props: any) {
         <>
 
             <button onclick={() => { addImg(); refetch(); }}>CAMBIA IMMAGINE</button>
-            <Show when={!!!img()}><BasicSpinner /></Show>
-            <img
-                onload={handleImgLoad}
-                ref={setImg}
-                src={image().src}
-                width={image().width}
-                height={image().height}
-                alt='immagine'
-            />
+            <Show when={!imgLoaded()}><BasicSpinner txt="caricamento immagine" /></Show>
+            {img()}
 
             <Show
                 when={loaded[0]()}
