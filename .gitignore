@@ -26,3 +26,11 @@ pnpm-debug.log*
 
 #data mock
 localdata/
+
+#db
+*.db
+_excelPlatform.csv
+/sqlite/*
+query.ts
+*jpg
+*sh

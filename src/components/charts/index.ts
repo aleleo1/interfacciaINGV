@@ -1,5 +1,4 @@
-export { default as BarChart } from './BarChart'
 export { default as PieChart } from './PieChart'
-export { default as BarChartV2 } from './BarChartV2'
+export { default as BarChart } from './BarChartV3'
 export { default as LollipopChart} from './LollipopChart'
 export { default as BaseChart} from './BaseXYChart'

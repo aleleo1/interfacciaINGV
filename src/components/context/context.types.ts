@@ -61,6 +61,8 @@ export type BarChartProps<T extends Record<string, any>>= {
     width: number
     height: number
     margin: number
+    circle?: boolean
+    oblique?: boolean
 } & Margins & Partial<xy>
 
 export type PieChartProps<T extends Record<string, any>> = {
@@ -73,6 +75,8 @@ export type PieChartProps<T extends Record<string, any>> = {
 }
 
 export type ContainerProps<T extends Record<string, any>>= {
-    chartType: string
+    chartType: string;
+    circle?: boolean;
+    oblique?: boolean;
 
 }

@@ -14,7 +14,7 @@ export const BasicSpinner = (p: { svg?: boolean, txt?: string }) => {
         role="status">
         <span
           class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-        >{p.txt ?? 'Loading...'}</span>
+        >Loading...</span>
       </div>
     </Show>
   )

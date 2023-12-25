@@ -1,18 +1,18 @@
-import { useStore } from '@nanostores/solid';
 import { $test, $fetchDataSource1, elaborate } from '../../store';
 import { createContext, createEffect, createMemo, createResource, createSignal, on, onMount, useContext } from "solid-js";
 import type { Functions, PropsProvider, Resources, Signals } from "./context.types";
 import { createStore } from 'solid-js/store';
 const IMAGES_SRCS = ['/images/test.jpg', '/images/test2.jpg']
-type CustomImageMetadata = { src: string, width: number, height: number, format: string, empty?: boolean }
+type CustomImageMetadata = { src: string, base64src: string | false, width: number, height: number, format: string, empty?: boolean }
 const EMPTY_IMAGE: CustomImageMetadata = {
     src: '',
-    width: 0,
-    height: 0,
-    format: '',
+    base64src: false,
+    width: 350,
+    height: 450,
+    format: 'jpg',
     empty: true
 }
-const DataContext = createContext<PropsProvider & { stores: { [key: string]: any }, images: { image: () => CustomImageMetadata } }>();
+const DataContext = createContext<PropsProvider & { stores: { [key: string]: any[] }, images: { image: () => CustomImageMetadata } }>();
 
 export function DataProviderV2(props: any) {
 
@@ -31,7 +31,8 @@ export function DataProviderV2(props: any) {
     const error = createSignal(false)
     const [errorg, setError] = error
     const imgRef = createSignal<HTMLImageElement | null>(null)
-    const [imagesIndex, setImagesIndex] = createSignal(0)
+    const imgIndexSignal = createSignal(0)
+    const [imagesIndex, setImagesIndex] = imgIndexSignal
 
 
     //RESOURCES
@@ -46,37 +47,83 @@ export function DataProviderV2(props: any) {
 
     //FUNCTIONS
     const { mutate, refetch } = dataSourceRes[1]
-    const getImgSrc = () => IMAGES_SRCS.at(imagesIndex())!
-    const navigateImgSrc = () => (IMAGES_SRCS.at(imagesIndex() + 1 < IMAGES_SRCS.length ? imagesIndex() + 1 : 0))!
-    const createImage = (src: string) => ({ src, width: 350, height: 350, format: 'jpg' })
-    const image = () => imageStore[0].at(imagesIndex())
-    const isImageThere = (src: string) => (imageStore[0].findIndex((elem) => (elem.src && elem.src === src)))
+
+
+    const base64ImgSrc = (src?: string) => new Promise<string | false>((resolve, reject) => fetch(src ?? getImgSrc()).then(response => response.blob()).then((blob) => {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            resolve(reader.result!.toString());
+        };
+        reader.onerror = () => reject(false);
+        reader.readAsDataURL(blob)
+    }));
+    const getImgSrc = (index?: number) => data[index ?? imagesIndex()].path
+    const getImgDate = () => data[imagesIndex()].x.toLocaleDateString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    const navigateImgSrc = (direction = 1) => (data[direction > 0 ? (imagesIndex() + direction < data.length ? imagesIndex() + direction : 0) : ((imagesIndex() + direction >= 0) ? imagesIndex() + direction : data.length - 1)].path)
+    const createImage: (src?: string) => Promise<CustomImageMetadata> = async (src?: string) => ({ src: src ?? getImgSrc(), base64src: await base64ImgSrc(src ?? getImgSrc()), width: 350, height: 350, format: 'jpg' })
+    const image = () => imageStore[0][imagesIndex()]
+    const isImageThere = (src: string) => (imageStore[0].findIndex((elem) => (elem && elem.src && elem.src === src)))
     const addImg =
-        () => {
-            if (isImageThere(navigateImgSrc()) < 0) {
-                imageStore[1]
-                    ([...imageStore[0], createImage(navigateImgSrc())])
+        async (src?: string, id?: number, direction = 1) => {
+            console.log('id: ', id, 'src: ', src, 'direction: ', direction)
+
+            if (isImageThere(src ?? navigateImgSrc(direction)) < 0) {
+                console.log('no image found with ', src ?? navigateImgSrc(direction))
+                if (id && src && imageStore[0][id] && imageStore[0][id].empty) {
+                    imageStore[1]([...imageStore[0]].fill(await createImage(src), id, id + direction))
+                    console.log('***** bar selezionata con immagine vuota ', imageStore[0])
+                }
+                else {
+                    if (direction > 0) {
+                        const newImages = id && id > imagesIndex() && src ? new Array<CustomImageMetadata>(id + 1 - imageStore[0].length).fill(EMPTY_IMAGE).fill(await createImage(src), id - imageStore[0].length)
+                            : [await createImage(navigateImgSrc(direction))]
+                        imageStore[1]
+                            ([...imageStore[0], ...newImages])
+                        console.log('***** dir > 0', imageStore[0])
+
+                    }
+                    else {
+                        const newImages = new Array<CustomImageMetadata>(data.length - imageStore[0].length).fill(EMPTY_IMAGE).fill(await createImage(navigateImgSrc(direction)), data.length - imageStore[0].length - 1)
+                        imageStore[1]([...imageStore[0], ...newImages])
+                        console.log('***** dir < 0', imageStore[0])
+                    }
+                }
+
+            }
+            let flg = false
+            if (!id && !src && imageStore[0][imagesIndex() + direction] && imageStore[0][imagesIndex() + direction].empty) {
+                flg = true
+                imageStore[1]([...imageStore[0]].fill(await createImage(navigateImgSrc(direction)), imagesIndex() + direction, imagesIndex() + (direction > 0 ? 2 : 0)))
             }
             setImagesIndex(
-                isImageThere(navigateImgSrc())
+                flg ? ((imagesIndex() + direction >= 0) ? imagesIndex() + direction : data.length - 1) : id ?? isImageThere(src ?? navigateImgSrc(direction))
             )
+            console.log('setted index: ', imagesIndex())
         }
 
 
     //IMAGES
-    const imageStore = createStore<CustomImageMetadata[]>([createImage(getImgSrc())])
+    const imageStore = createStore<CustomImageMetadata[]>([])
 
 
-    //EFFECTS
+    //EFFECTS   
+
     createEffect(() => setLoaded(!dataSource.loading))
     createEffect(() => setError(dataSource.error))
-    createEffect(() => { setData([...elaborate(dataSource())]) })
+    createEffect(async () => {
+        if (!dataSource.loading && !dataSource.error) {
+            setData(await elaborate(dataSource()));
+            imageStore[1]([...imageStore[0], await createImage()])
+            console.log('image store: ', imageStore[0])
+        }
+    })
 
-    createEffect(() => { console.log(imagesIndex(), isImageThere(navigateImgSrc())) })
 
-    const signals: Signals = { test, loaded, error, imgRef }
+
+
+    const signals: Signals = { test, loaded, error, imgRef, imgIndexSignal }
     const resources: Resources = { dataSource }
-    const functions: Functions = { mutate, refetch, addImg }
+    const functions: Functions = { refetch, addImg, getImgDate }
     const stores = { data }
     const images = { image }
 
