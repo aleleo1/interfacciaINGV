@@ -74,7 +74,7 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
                 <For each={bars}>
                     {(bar, index) => (
                         <>
-                            {!p.oblique ?
+                            {!p.nolines && (!p.oblique ?
                                 <rect
                                     x={bar.x}
                                     y={bar.y}
@@ -93,7 +93,7 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
                                     onMouseOver={() => !p.circle ? handleMouseOver(bar) : {}}
                                     onMouseOut={() => !p.circle ? handleMouseOut(bar) : {}}
                                     onclick={() => !p.circle ? handleClick(bar) : {}}
-                                    style={`stroke:${bar.color};stroke-width:${bar.width}`} />}
+                                    style={`stroke:${bar.color};stroke-width:${bar.width}`} />)}
                             {p.circle && <circle
                                 cx={bar.x}
                                 cy={bar.y}

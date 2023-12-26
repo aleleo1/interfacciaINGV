@@ -60,6 +60,7 @@ export default function Container(props: any) {
                             margin={10}
                             circle={props.circle}
                             oblique={props.oblique}
+                            nolines={props.nolines}
                         />
                     </Show>
                 </Show>

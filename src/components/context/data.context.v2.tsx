@@ -1,4 +1,4 @@
-import { $test, $fetchDataSource1, elaborate } from '../../store';
+import { $test, dataStores, dataResources } from '../../store';
 import { createContext, createEffect, createMemo, createResource, createSignal, on, onMount, useContext } from "solid-js";
 import type { Functions, PropsProvider, Resources, Signals } from "./context.types";
 import { createStore } from 'solid-js/store';
@@ -36,17 +36,19 @@ export function DataProviderV2(props: any) {
 
 
     //RESOURCES
-    const dataSourceRes = createResource($fetchDataSource1, { initialValue: [] });
-    const dataSource = dataSourceRes[0]
+    //const dataSourceRes = createResource(dataFetches['$'+props.src], { initialValue: [] });
+    
+
+    const dataSource = dataResources[props.src][0]
 
 
     //STORES
-    const [data, setData] = createStore<any>([])
-
+    const [data, setData] = dataStores[props.src]
+    
 
 
     //FUNCTIONS
-    const { mutate, refetch } = dataSourceRes[1]
+    const { mutate, refetch } = dataResources[props.src][1]
 
 
     const base64ImgSrc = (src?: string) => new Promise<string | false>((resolve, reject) => fetch(src ?? getImgSrc()).then(response => response.blob()).then((blob) => {
@@ -112,7 +114,8 @@ export function DataProviderV2(props: any) {
     createEffect(() => setError(dataSource.error))
     createEffect(async () => {
         if (!dataSource.loading && !dataSource.error) {
-            setData(await elaborate(dataSource()));
+            console.log('PROPS SRC', props.src)
+            setData(await dataSource());
             imageStore[1]([...imageStore[0], await createImage()])
             console.log('image store: ', imageStore[0])
         }
