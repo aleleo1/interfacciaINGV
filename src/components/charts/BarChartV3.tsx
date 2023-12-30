@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import { createStore } from 'solid-js/store';
 import type { BarChartProps as ChartProps } from '../context/context.types';
 import { useData } from '../context/data.context.v2';
-import { BasicSpinner } from '../components.utils';
+import { BasicError, BasicSpinner } from '../components.utils';
 
 type D3Data = { x: number; y: number; width: number; height: number; color: any; id: number; path?: string }
 type MockedData = Partial<D3Data & { x: number; y: number }>

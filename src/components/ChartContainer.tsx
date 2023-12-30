@@ -2,7 +2,7 @@ import { Show, createEffect, createSignal, on, onMount } from "solid-js";
 import { lazyImports } from "./utils";
 import { useData } from "./context/data.context.v2";
 import * as C from './constants'
-import { BasicSpinner, BasicError } from "./components.utils";
+import { BasicSpinner } from "./components.utils";
 const [BarChart] = lazyImports('BarChart')
 
 
@@ -11,11 +11,10 @@ export default function Container(props: any) {
 
     const { image } = useData()!.images
 
-    const { refetch, addImg, getImgDate, load, navigate } = dataP.functions;
-    const { loaded, error, imgRef } = useData()!.signals
+    const { addImg, getImgDate, load, navigate } = dataP.functions;
     const [imgLoaded, setImgLoaded] = createSignal(false)
     onMount(async () => { await load(); /* await addImg(null, null, 1, true) */ })
-    const [img, setImg] = createSignal<any>(<img />)
+    const [img] = createSignal<any>(<img />)
     createEffect(on(image, () => {
         if (image() !== undefined && image().src !== img().src) {
 
