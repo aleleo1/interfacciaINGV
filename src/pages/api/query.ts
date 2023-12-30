@@ -93,15 +93,15 @@ export const GET: APIRoute = async (req) => {
         ]), { status: 200 })
     }
     const { query } = param ? requests[param] : requests['default']
-    console.log(req.url.searchParams, prec, query(limit, prec))
+    console.log(req.url.searchParams, prec, query(limit, prec), process.cwd())
 
     try {
         const file = await (await fetch(req.url.origin + '/db/_INGV.db')).arrayBuffer()
-        await fs.writeFile(path.join(process.cwd(), 'test.db'), Buffer.from(file))
+        await fs.writeFile(/* path.join( *//* process.cwd() */'/tmp/'+ 'test.db'/* ) */, Buffer.from(file))
     } catch (err) {
         console.log(err)
     }
-    const db = new sqlite3.Database(path.join(process.cwd(), 'test.db'), (err) => {
+    const db = new sqlite3.Database(/* path.join( *//* process.cwd() */'/tmp/'+'test.db'/* ) */, (err) => {
         if (err) console.log(err)
 
     });
