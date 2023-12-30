@@ -10,7 +10,7 @@ import * as d3 from 'd3'
 import type { APIRoute } from "astro";
 
 import fs from 'node:fs/promises';
-
+import fetch from 'node-fetch'
 import path from 'node:path'
 
 const requests: { [key: string]: { query: (limit?: number, prec?: number) => string; build?: (row: any, i: number) => { x: string | Date | null, y: number, i: number, ylabel?: string } } } = {
