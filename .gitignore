@@ -34,3 +34,4 @@ localdata/
 /sqlite/*
 *jpg
 *sh
+.vercel
