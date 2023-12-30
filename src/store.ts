@@ -1,39 +1,57 @@
-import * as d3 from 'd3';
-import { atom } from 'nanostores';
+import { atom, map } from 'nanostores';
 import { createStore } from 'solid-js/store';
-import { createResource, type InitializedResource, type InitializedResourceOptions, type InitializedResourceReturn } from 'solid-js';
-export const elaborate = async (res: any[]) => (Object.entries(
-  (await $fetchJSONcomments()).reduce(
-    (acc: any, curr: any) => {
-      acc[curr.postId] = Math.round(Math.random() * 100)
-      return acc
-    }, {}
-  )
-).map(
-  ([postId, comments], i) => ({
-    x: res[i]
-      ? (d3.isoParse((res[i]['Date']))) : null, y: comments,
-    path: res[i] ? '/images/S2/' + res[i]['Path'] : null,
-    i
-  })
-).filter((elem) => (elem !== null))
-  .slice(0, Math.floor(Math.random() * 100))
-)
+import { createEffect, createResource, createSignal, on, type InitializedResourceReturn } from 'solid-js';
+import type { Vulcano } from './components/context/context.types';
 
-export const $test = atom(1)
-const $fetchJSONcomments: () => Promise<any[]> = async () => (await d3.json('https://jsonplaceholder.typicode.com/comments') as any[])
 
-const dataFetches: { [key: string]: () => Promise<any> } = {
-  $lst: async () => (await elaborate(await d3.csv('/db/_data.csv'))),
-  $vrp: async () => (await elaborate(await d3.csv('/db/_data.csv')))
+const lstSignal = createSignal(1)
+const [getLstS, setLstS] = lstSignal
+createEffect(on(getLstS, () => {
+  console.log(getLstS())
+  if (getLstS() >= 1) {
+    dataResources.lst[1].refetch()
+
+  }
+}, { defer: true }))
+const scmSignal = createSignal(1)
+const [getscmS, setscmS] = scmSignal
+createEffect(on(getscmS, () => {
+  if (getscmS() >= 1) {
+    dataResources.scm[1].refetch()
+  }
+}, { defer: true }))
+export const getDataTrigger = {
+  lst: getLstS,
+  scm: getscmS
+}
+export const loadData = {
+  lst: (val: number) => setLstS(val),
+  scm: (val: number) => setscmS(val)
 }
 
-export const dataResources:  { [key: string]: InitializedResourceReturn<any, any> }= {
-  lst:  createResource(dataFetches.$lst, {initialValue: []}),
-  vrp:  createResource(dataFetches.$vrp, {initialValue: []}),
+export const navigateData = {
+  lst: (val: number) => setLstS(getLstS() + val > 1 ? getLstS() + val : 1),
+  scm: (val: number) => setscmS(getscmS() + val > 1 ? getscmS() + val : 1)
+}
+const dataFetches: { [key: string]: (limit: number) => Promise<any> } = {
+  $lst: async (limit: number) => (await fetch(`/api/query?limit=${limit}`)).json(),
+  $scm: async (limit: number) => (await fetch(`/api/query?opt=scene_monitoring&limit=${limit}`)).json()
 }
 
-export const dataStores:  { [key: string]: any }= {
-  lst:  createStore<any>([]),
-  vrp:  createStore<any>([]),
+export const dataResources: { [key: string]: InitializedResourceReturn<any, any> } = {
+  lst: createResource(getLstS, dataFetches.$lst, { initialValue: [] }),
+  scm: createResource(getscmS, dataFetches.$scm, { initialValue: [] }),
 }
+
+const $vulcano = atom('')
+export const getVulcano = () => $vulcano.get()
+export const setVulcano = (val: string) => $vulcano.set(val)
+$vulcano.subscribe((val) => Object.values(dataResources).forEach(f => f[1].refetch()))
+
+/* export const dataStores: {
+  [key: string]: any
+} = {
+  lst: createStore<any>([]),
+  scm: createStore<any>([]),
+} */
+

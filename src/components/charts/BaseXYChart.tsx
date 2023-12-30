@@ -19,7 +19,6 @@ export default function BaseChart<T extends Record<string, any>>(p: ChartProps<T
 
     const xAxis = () => d3.axisBottom(p.x).ticks(d3.timeMonth.every(0.3), d3.timeYear.every(0.5)).tickFormat(d3.timeFormat("%d %m %y"))
     createEffect(() => {
-        console.log('**** GX EFFECT')
         setgx(<g
             transform={`translate(0,${p.height - p.mb})`}
             fill="none"
@@ -31,9 +30,8 @@ export default function BaseChart<T extends Record<string, any>>(p: ChartProps<T
     })
 
 
-    const yAxis = () => d3.axisLeft(p.y)
+    const yAxis = () => (p.ylabels && Object.keys(p.ylabels).length > 0) ? d3.axisLeft(p.y).tickFormat(d => p.ylabels[d] ?? '') : d3.axisLeft(p.y)
     createEffect(() => {
-        console.log('**** GY EFFECT')
         setgy(<g
             fill="none"
             font-size="10"

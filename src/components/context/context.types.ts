@@ -4,7 +4,7 @@ type DataType = any; // Replace with the actual type
 type ElaborationType = any; // Replace with the actual type
 
 export interface Functions {
-    [key:string]: () => void | ElaborationType;
+    [key: string]: () => void | ElaborationType;
 }
 
 export interface Signals {
@@ -39,7 +39,7 @@ interface ProviderFunctions {
 
 }
 
-export interface Provider extends PropsProvider, ProviderFunctions{}
+export interface Provider extends PropsProvider, ProviderFunctions { }
 
 
 /* ******************** CHART TYPES */
@@ -56,14 +56,16 @@ type Margins = {
     ml: number,
     mr: number
 
-} 
-export type BarChartProps<T extends Record<string, any>>= {
+}
+export type BarChartProps<T extends Record<string, any>> = {
     width: number
     height: number
     margin: number
     circle?: boolean
     oblique?: boolean
-    nolines?:boolean
+    nolines?: boolean
+    mode?: string
+    ylabels?: { [key: number]: string }
 } & Margins & Partial<xy>
 
 export type PieChartProps<T extends Record<string, any>> = {
@@ -75,11 +77,18 @@ export type PieChartProps<T extends Record<string, any>> = {
     value: (d: T) => number
 }
 
-export type ContainerProps<T extends Record<string, any>>= {
+export type ContainerProps<T extends Record<string, any>> = {
     chartType: string;
-    src:string;
+    src: string;
     circle?: boolean;
     oblique?: boolean;
-    nolines?:boolean;
+    nolines?: boolean;
+    mode?: string
+
+}
+
+
+export type Vulcano = {
+    name: string;
 
 }

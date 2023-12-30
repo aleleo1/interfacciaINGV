@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.3.1",
-    "@astrojs/node": "^7.0.1",
     "@astrojs/solid-js": "^3.0.2",
     "@astrojs/tailwind": "^5.0.3",
     "@astrojs/vercel": "^6.1.0",
@@ -20,6 +19,7 @@
     "d3": "^7.8.5",
     "nanostores": "^0.9.5",
     "solid-js": "^1.4.3",
+    "sqlite3": "^5.1.6",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.3.3"
   },

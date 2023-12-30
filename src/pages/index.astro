@@ -1,128 +1,103 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Container from "../components/container";
+import Menu from "../components/menu.astro";
+import Icontainer from "../components/icontainer.astro";
+import Ibox from "../components/ibox.astro";
 ---
 
 <Layout title="Tesi INGV">
 	<main class="flex flex-col justify-center items-center gap-y-20">
 		<div class="w-screen px-40 py-10">
-			<h1 class="my-10">Thermal Emissions Monitoring</h1>
 			<div
-				class="border-solid border-gray-500 border-4 gap-y-20 flex flex-col items-center py-10"
+				class="border-solid border-gray-500 border-4 gap-y-20 flex flex-row items-start p-10"
 			>
-				<div class="flex flex-col items-start">
-					<h3 class="ml-20">Land Surface Temperature (LST)</h3>
-					<div
-						class="h-fit flex flex-row gap-x-10 justify-evenly items-center p-10"
-					>
-						<Container
-							chartType="BAR"
-							src={['lst', 'vrp'][ Math.random() > 0.5 ? 1 : 0]}
-							oblique={true}
-							circle={true}
-							client:only
-						/>
-					</div>
-				</div>
-				<div class="flex flex-col items-start">
-					<h3 class="ml-20">Volcanic Radiative Power</h3>
-					<div
-						class="h-fit flex flex-row gap-x-10 justify-evenly items-center p-10"
-					>
-						<Container chartType="BAR" src={['lst', 'vrp'][ Math.random() > 0.5 ? 1 : 0]} src="lst" circle={true} client:only />
-					</div>
-				</div>
-				<div class="flex flex-col items-start">
-					<h3 class="ml-20">Active Craters</h3>
-					<div
-						class="h-fit flex flex-row gap-x-10 justify-evenly items-center p-10"
-					>
-						<Container chartType="BAR" src={['lst', 'vrp'][ Math.random() > 0.5 ? 1 : 0]} oblique={true} client:only />
-					</div>
-				</div>
+				<Menu />
 			</div>
-			<h1 class="my-10">Scene Monitoring</h1>
-			<div
-				class="border-solid border-gray-500 border-4 gap-y-20 flex flex-col items-center py-10"
-			>
-				<div class="flex flex-col items-start">
-					<div class="h-fit flex flex-row gap-x-10 items-center p-10">
-						<Container
-							chartType="BAR"
-							src={['lst', 'vrp'][ Math.random() > 0.5 ? 1 : 0]}
-							circle={true}
-							nolines={true}
-							client:only
-						/>
-					</div>
-				</div>
-			</div>
-			<h1 class="my-10">Effusive Activity Monitoring</h1>
-			<div
-				class="border-solid border-gray-500 border-4 gap-y-20 flex flex-col items-center py-10"
-			>
-				<div class="flex flex-col items-start">
-					<h3 class="ml-20">Lava Flow Length / Area</h3>
-					<div
-						class="h-fit flex flex-row gap-x-10 justify-evenly items-center p-10"
-					>
-						<Container chartType="BAR" src={['lst', 'vrp'][ Math.random() > 0.5 ? 1 : 0]} oblique={true} client:only />
-					</div>
-				</div>
-				<div class="flex flex-col items-start">
-					<h3 class="ml-20">Numero Hotspot / Lava Flow Length</h3>
-					<div
-						class="h-fit flex flex-row gap-x-10 justify-evenly items-center p-10"
-					>
-						<Container
-							chartType="BAR"
-							src={['lst', 'vrp'][ Math.random() > 0.5 ? 1 : 0]}
-							circle={true}
-							nolines={true}
-							client:only
-						/>
-					</div>
-				</div>
-				<div class="flex flex-col items-start">
-					<h3 class="ml-20">Lava Front</h3>
-					<div
-						class="h-fit flex flex-row gap-x-10 justify-evenly items-center p-10"
-					>
-						<Container chartType="BAR" src={['lst', 'vrp'][ Math.random() > 0.5 ? 1 : 0]} circle={true} client:only />
-					</div>
-				</div>
-			</div>
-			<h1 class="my-10">Explosive Activity Monitoring</h1>
-			<div
-				class="border-solid border-gray-500 border-4 gap-y-20 flex flex-col items-center py-10"
-			>
-				<div class="flex flex-col items-start">
-					<h3 class="ml-20">Volcanic Cloud</h3>
-					<div
-						class="h-fit flex flex-row gap-x-10 justify-evenly items-center p-10"
-					>
-						<Container
-							chartType="BAR"
-							src={['lst', 'vrp'][ Math.random() > 0.5 ? 1 : 0]}
-							circle={true}
-							nolines={true}
-							client:only
-						/>
-					</div>
-				</div>
-			</div>
+			<Ibox  title="Thermal Emissions Monitoring">
+				<Icontainer
+					title="Land Surface Temperature (LST)"
+					chartType="BAR"
+					src="lst"
+					oblique={true}
+					circle={true}
+					
+				/>
+				<Icontainer
+					title="Volcanic Radiative Power"
+					chartType="BAR"
+					src="lst"
+					src="lst"
+					circle={true}
+					
+				/>
+				<Icontainer
+					title="Active Craters"
+					chartType="BAR"
+					src="lst"
+					oblique={true}
+					
+				/>
+			</Ibox>
+			<Ibox  title="Scene Monitoring">
+				<Icontainer
+					title=""
+					chartType="BAR"
+					src="scm"
+					circle={true}
+					nolines={true}
+					mode="verbal"
+					
+				/>
+			</Ibox>
+			<Ibox  title="Effusive Activity Monitoring">
+				<Icontainer
+					title="Lava Flow Length / Area"
+					chartType="BAR"
+					src="lst"
+					oblique={true}
+					
+				/>
+
+				<Icontainer
+					title="Numero Hotspot / Lava Flow Length"
+					chartType="BAR"
+					src="lst"
+					circle={true}
+					nolines={true}
+					
+				/>
+
+				<Icontainer
+					title="Lava Front"
+					chartType="BAR"
+					src="lst"
+					circle={true}
+					
+				/>
+			</Ibox>
+
+			<Ibox  title="Explosive Activity Monitoring">
+				<Icontainer
+					title="Volcanic Cloud"
+					chartType="BAR"
+					src="lst"
+					circle={true}
+					nolines={true}
+					
+				/>
+			</Ibox>
 		</div>
+
+		<style>
+			main {
+				margin: auto;
+				padding: 1rem;
+				width: 75%;
+				max-width: calc(100% - 2rem);
+				color: white;
+				font-size: 20px;
+				line-height: 1.6;
+			}
+		</style>
 	</main>
 </Layout>
-
-<style>
-	main {
-		margin: auto;
-		padding: 1rem;
-		width: 75%;
-		max-width: calc(100% - 2rem);
-		color: white;
-		font-size: 20px;
-		line-height: 1.6;
-	}
-</style>

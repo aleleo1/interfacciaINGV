@@ -1,0 +1,20 @@
+---
+interface Props extends ContainerProps<any> {
+    title: string;
+}
+import Container from "./container";
+import type { ContainerProps } from "./context/context.types";
+const p = Astro.props
+---
+
+<div class="w-full flex flex-col items-start">
+   {p.title.trim() !== '' && <h3 class="ml-20">{p.title}</h3>}
+    <div
+        class="w-full h-fit flex flex-row gap-x-10 justify-evenly items-center p-10"
+    >
+        <Container
+            {...p}
+            client:only="solid-js"
+        />
+    </div>
+</div>

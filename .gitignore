@@ -29,8 +29,8 @@ localdata/
 
 #db
 *.db
-_excelPlatform.csv
+!_INGV.db
+*.csv
 /sqlite/*
-query.ts
 *jpg
 *sh
