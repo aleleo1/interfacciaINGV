@@ -39,7 +39,7 @@ console.log(vulcani);
     />
     <!-- Dropdown content goes here -->
     {
-      vulcani.map((v) => (
+      vulcani.map((v: any) => (
         <a
           id={`${v.name}`}
           href={`#${v.name}`}
@@ -65,23 +65,23 @@ console.log(vulcani);
     // Function to toggle the dropdown state
     function toggleDropdown() {
       isOpen = !isOpen;
-      dropdownMenu.classList.toggle("hidden", !isOpen);
+      dropdownMenu!.classList.toggle("hidden", !isOpen);
     }
 
     // Set initial state
 
-    dropdownButton.addEventListener("click", () => {
+    dropdownButton!.addEventListener("click", () => {
       toggleDropdown();
     });
 
     // Add event listener to filter items based on input
-    searchInput.addEventListener("input", () => {
-      const searchTerm = searchInput.value.toLowerCase();
+    searchInput!.addEventListener("input", () => {
+      const searchTerm = (searchInput! as any).value.toLowerCase();
       console.log("******SEACHTERM ", searchTerm);
-      const items = dropdownMenu.querySelectorAll("a");
+      const items = dropdownMenu!.querySelectorAll("a");
 
       items.forEach((item) => {
-        const text = item.textContent.toLowerCase();
+        const text = item.textContent!.toLowerCase();
         if (text.includes(searchTerm)) {
           item.style.display = "block";
         } else {
@@ -90,11 +90,11 @@ console.log(vulcani);
       });
     });
 
-    function setV(event) {
+    function setV(event: any) {
       console.log(event);
       setVulcano(event.target.id);
       toggleDropdown();
-      selectedVulcano.textContent = event.target.id;
+      selectedVulcano!.textContent = event.target.id;
     }
     const vulcani = document.getElementsByClassName("vulcano");
     for (let i = 0; i < vulcani.length; i++) {

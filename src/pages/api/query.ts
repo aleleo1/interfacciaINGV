@@ -82,7 +82,7 @@ ORDER BY
 
 export const GET: APIRoute = async (req) => {
     const param = req.url.searchParams && req.url.searchParams.get('opt')
-    const limit = req.url.searchParams && req.url.searchParams.get('limit') && (Number.parseInt(req.url.searchParams.get('limit')!))
+    const limit = (req.url.searchParams && req.url.searchParams.get('limit')) ? (Number.parseInt(req.url.searchParams.get('limit')!)) : undefined
     const prec = limit && (limit > 1 ? ((limit - 1) * 100) + 99 : 0)
 
     if (param && param === 'vulcani') {
@@ -92,7 +92,7 @@ export const GET: APIRoute = async (req) => {
             { name: 'Vesuvio' }
         ]), { status: 200 })
     }
-    const { query, build } = (param && requests[param]) ?? requests['default']
+    const { query } = param ? requests[param] : requests['default']
     console.log(req.url.searchParams, prec, query(limit, prec))
 
     try {
