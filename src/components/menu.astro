@@ -1,6 +1,6 @@
 ---
 const vulcani = /* await getVulcani() */ await (
-  await fetch("http://localhost:4321//api/query?opt=vulcani")
+  await fetch(new URL(Astro.request.url).origin + "/api/query?opt=vulcani")
 ).json();
 console.log(vulcani);
 ---
@@ -58,7 +58,7 @@ console.log(vulcani);
     const dropdownButton = document.getElementById("dropdown-button");
     const dropdownMenu = document.getElementById("dropdown-menu");
     const searchInput = document.getElementById("search-input");
-    const selectedVulcano = document.getElementById('selected_vulcano')
+    const selectedVulcano = document.getElementById("selected_vulcano");
 
     let isOpen = false; // Set to true to open the dropdown by default
 
