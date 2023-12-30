@@ -96,7 +96,7 @@ export const GET: APIRoute = async (req) => {
     console.log(req.url.searchParams, prec, query(limit, prec))
 
     try {
-        const file = await (await fetch('http://localhost:4321/db/_INGV.db')).arrayBuffer()
+        const file = await (await fetch(req.url.origin + '/db/_INGV.db')).arrayBuffer()
         await fs.writeFile(path.join(process.cwd(), 'test.db'), Buffer.from(file))
     } catch (err) {
         console.log(err)
