@@ -12,18 +12,26 @@ import type { APIRoute } from "astro";
 import fs from 'node:fs/promises';
 import fetch from 'node-fetch'
 import path from 'node:path'
-
+const imageData = `CASE WHEN row_num = 1 THEN FALSE ELSE TRUE END AS empty,
+'' as base64src,
+350 as width,
+450 as height,
+'jpg' as format`
+const data = `DATE("Date") AS x,
+'/images/S2/' || "Path" AS path, ROW_NUMBER() OVER (
+    ORDER BY "Date"
+) -1 i,`
 const requests: { [key: string]: { query: (limit?: number, prec?: number) => string; build?: (row: any, i: number) => { x: string | Date | null, y: number, i: number, ylabel?: string } } } = {
     'default': {
         query: (limit?: number, prec?: number) => `SELECT 
-        DATE("Date") AS x,
-        '/images/S2/' || "Path" AS path,
+        ${data}
         CAST(ROUND(ABS(RANDOM()) * 0.00000000000000001) AS INTEGER) AS y,
-        ROW_NUMBER() OVER (
-            ORDER BY "Date"
-    ) -1 i 
-    FROM 
-        DATI
+    ${imageData}
+    FROM (
+        SELECT *,
+        ROW_NUMBER() OVER (ORDER BY "Date") AS row_num
+        FROM DATI
+       ) d
         WHERE 'Cascading output' NOT LIKE "Cascading output"
         ORDER BY "Date"
         LIMIT 100 ${prec ? 'OFFSET ' + prec.toString() : ''}
@@ -41,15 +49,14 @@ const requests: { [key: string]: { query: (limit?: number, prec?: number) => str
     'scene_monitoring': {
         query: (limit?: number, prec?: number) => `
         SELECT 
-    DATE("Date") AS x,
-    "Cascading output" AS ylabel,
-    '/images/S2/' || "Path" AS path,
+    ${data}
     10 * DENSE_RANK() OVER (ORDER BY "Cascading output" COLLATE NOCASE) AS y,
-    ROW_NUMBER() OVER (
-        ORDER BY "Date"
-) -1 i
-FROM 
-    DATI
+${imageData}
+    FROM (
+        SELECT *,
+        ROW_NUMBER() OVER (ORDER BY "Date") AS row_num
+        FROM DATI
+       ) d
 WHERE 'Cascading output' NOT LIKE "Cascading output"
 ORDER BY 
     "Date"
@@ -97,11 +104,11 @@ export const GET: APIRoute = async (req) => {
 
     try {
         const file = await (await fetch(req.url.origin + '/db/_INGV.db')).arrayBuffer()
-        await fs.writeFile(/* path.join( *//* process.cwd() */'/tmp/'+ 'test.db'/* ) */, Buffer.from(file))
+        await fs.writeFile(/* path.join( *//* process.cwd() */'/tmp/' + 'test.db'/* ) */, Buffer.from(file))
     } catch (err) {
         console.log(err)
     }
-    const db = new sqlite3.Database(/* path.join( *//* process.cwd() */'/tmp/'+'test.db'/* ) */, (err) => {
+    const db = new sqlite3.Database(/* path.join( *//* process.cwd() */'/tmp/' + 'test.db'/* ) */, (err) => {
         if (err) console.log(err)
 
     });
@@ -109,10 +116,13 @@ export const GET: APIRoute = async (req) => {
 
         db.on('open', () => {
             db.serialize(() => {
-                db.all(query(limit, prec), (err, rows) => {
+                db.all(query(limit, prec), async (err, rows) => {
                     if (err) {
                         reject(err)
                         console.log(err)
+                    }
+                    if(rows && rows.length > 0){
+                        rows[0].base64src = await (await fetch(req.url.origin + '/api/image?img='+ rows[0].path)).text()
                     }
                     rows && resolve(rows/* .map(build) */)
                 });

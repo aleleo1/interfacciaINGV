@@ -13,7 +13,7 @@ export default function Container(props: any) {
 
     const { addImg, getImgDate, load, navigate } = dataP.functions;
     const [imgLoaded, setImgLoaded] = createSignal(false)
-    onMount(async () => { await load(); /* await addImg(null, null, 1, true) */ })
+    onMount(async () => { console.log('CONTAINER MOUNTED'); await load(); /* await addImg(null, null, 1, true) */ })
     const [img] = createSignal<any>(<img />)
     createEffect(on(image, () => {
         if (image() !== undefined && image().src !== img().src) {
@@ -43,7 +43,7 @@ export default function Container(props: any) {
             </div>
             <button onclick={async () => { await addImg(undefined, undefined, -1); }}>-</button>
             <button onclick={async () => { await addImg(undefined, undefined, 1); }}>+</button>
-        {/*     <Show
+            {/*     <Show
                 when={loaded[0]()}
                 fallback={<BasicSpinner svg={true} />}
             >
@@ -51,21 +51,21 @@ export default function Container(props: any) {
                     when={!error[0]()}
                     fallback={<BasicError msg='Impossibile caricare il grafico' />}
                 > */}
-                    <Show when={props.type === 'BAR'}>
-                        <BarChart
-                            width={barW()}
-                            height={barH()}
-                            margin={10}
-                            circle={props.circle}
-                            oblique={props.oblique}
-                            nolines={props.nolines}
-                            mode={props.mode ?? 'linear'}
-                        />
-                    </Show>
-              {/*   </Show>
+            <Show when={props.type === 'BAR'}>
+                <BarChart
+                    width={barW()}
+                    height={barH()}
+                    margin={10}
+                    circle={props.circle}
+                    oblique={props.oblique}
+                    nolines={props.nolines}
+                    mode={props.mode ?? 'linear'}
+                />
+            </Show>
+            {/*   </Show>
             </Show > */}
-            <button onclick={async () => { await navigate(-1); }}>-</button>
-            <button onclick={async () => { await navigate(+ 1); }}>+</button>
+            <button onclick={() => { navigate(-1); }}>-</button>
+            <button onclick={() => { navigate(+ 1); }}>+</button>
 
         </>
     )

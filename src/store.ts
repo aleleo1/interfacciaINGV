@@ -1,9 +1,7 @@
-import { atom, map } from 'nanostores';
-import { createStore } from 'solid-js/store';
+import { atom } from 'nanostores';
 import { createEffect, createResource, createSignal, on, type InitializedResourceReturn } from 'solid-js';
-import type { Vulcano } from './components/context/context.types';
 
-
+export const [local, setLocal] = createSignal(0)
 const lstSignal = createSignal(1)
 const [getLstS, setLstS] = lstSignal
 createEffect(on(getLstS, () => {
@@ -24,15 +22,24 @@ export const getDataTrigger = {
   lst: getLstS,
   scm: getscmS
 }
+const setDataTrigger = {
+  lst: setLstS,
+  scm: setscmS
+}
 export const loadData = {
   lst: (val: number) => setLstS(val),
   scm: (val: number) => setscmS(val)
 }
-
-export const navigateData = {
-  lst: (val: number) => setLstS(getLstS() + val > 1 ? getLstS() + val : 1),
-  scm: (val: number) => setscmS(getscmS() + val > 1 ? getscmS() + val : 1)
+const chooseIndex = (bk: number, prop: string) => {
+  if (bk === getDataTrigger[prop]()) {
+    return getDataTrigger[prop]()
+  } else return bk;
 }
+const setTrigger = (val: number, prop: string) => {
+  setDataTrigger[prop](val)
+}
+export const navigateData = (val: number, bk: number, prop: string) => { const i = chooseIndex(bk, prop); const index = i + val > 1 ? i + val : 1; setTrigger(index, prop); return index; }
+
 const dataFetches: { [key: string]: (limit: number) => Promise<any> } = {
   $lst: async (limit: number) => (await fetch(`/api/query?limit=${limit}`)).json(),
   $scm: async (limit: number) => (await fetch(`/api/query?opt=scene_monitoring&limit=${limit}`)).json()

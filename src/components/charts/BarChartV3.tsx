@@ -1,4 +1,4 @@
-import { createSignal, createEffect, For, Show, onMount } from 'solid-js';
+import { createSignal, createEffect, For, Show, onMount, onCleanup } from 'solid-js';
 import BaseChart from './BaseXYChart'
 import * as d3 from 'd3';
 import { createStore } from 'solid-js/store';
@@ -15,9 +15,9 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
     const { data } = useData()!.stores
     const [, setImagesIndex] = useData()!.signals.imgIndexSignal
     const { addImg } = useData()!.functions
-    onMount(async () => {
-        await addImg(undefined, undefined, 1, true)
-    })
+/*     onMount(async () => {
+        console.log('MOUNTED')
+    }) */
     const marginTop = 20;
     const marginRight = 20;
     const marginBottom = 30;
