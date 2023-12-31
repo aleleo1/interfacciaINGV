@@ -1,5 +1,5 @@
 import { atom } from 'nanostores';
-import { createEffect, createResource, createSignal, on, type InitializedResourceReturn } from 'solid-js';
+import { createEffect, createResource, createSignal, on, type InitializedResourceReturn, type Accessor, type Setter } from 'solid-js';
 
 export const [local, setLocal] = createSignal(0)
 const lstSignal = createSignal(1)
@@ -18,15 +18,15 @@ createEffect(on(getscmS, () => {
     dataResources.scm[1].refetch()
   }
 }, { defer: true }))
-export const getDataTrigger = {
+export const getDataTrigger: { [key: string]: Accessor<number> } = {
   lst: getLstS,
   scm: getscmS
 }
-const setDataTrigger = {
+const setDataTrigger: { [key: string]: Setter<number> } = {
   lst: setLstS,
   scm: setscmS
 }
-export const loadData = {
+export const loadData: { [key: string]: (val: number) => void } = {
   lst: (val: number) => setLstS(val),
   scm: (val: number) => setscmS(val)
 }

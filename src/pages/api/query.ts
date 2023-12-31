@@ -116,13 +116,13 @@ export const GET: APIRoute = async (req) => {
 
         db.on('open', () => {
             db.serialize(() => {
-                db.all(query(limit, prec), async (err, rows) => {
+                db.all(query(limit, prec), async (err, rows: any) => {
                     if (err) {
                         reject(err)
                         console.log(err)
                     }
-                    if(rows && rows.length > 0){
-                        rows[0].base64src = await (await fetch(req.url.origin + '/api/image?img='+ rows[0].path)).text()
+                    if (rows && rows.length > 0) {
+                        rows[0].base64src = await (await fetch(req.url.origin + '/api/image?img=' + rows[0].path)).text()
                     }
                     rows && resolve(rows/* .map(build) */)
                 });

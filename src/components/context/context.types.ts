@@ -4,7 +4,7 @@ type DataType = any; // Replace with the actual type
 type ElaborationType = any; // Replace with the actual type
 
 export interface Functions {
-    [key: string]: () => void | ElaborationType;
+    [key: string]: (...args: any) => void | ElaborationType;
 }
 
 export interface Signals {
