@@ -18,7 +18,7 @@ const imageData = `CASE WHEN row_num = 1 THEN FALSE ELSE TRUE END AS empty,
 450 as height,
 'jpg' as format`
 const data = `DATE("Date") AS x,
-'/images/S2/' || "Path" AS path, ROW_NUMBER() OVER (
+"Path" AS path, ROW_NUMBER() OVER (
     ORDER BY "Date"
 ) -1 i,`
 const requests: { [key: string]: { query: (limit?: number, prec?: number) => string; build?: (row: any, i: number) => { x: string | Date | null, y: number, i: number, ylabel?: string } } } = {
@@ -100,7 +100,6 @@ export const GET: APIRoute = async (req) => {
         ]), { status: 200 })
     }
     const { query } = param ? requests[param] : requests['default']
-    console.log(req.url.searchParams, prec, query(limit, prec), process.cwd())
 
     try {
         const file = await (await fetch(req.url.origin + '/db/_INGV.db')).arrayBuffer()
@@ -134,7 +133,7 @@ export const GET: APIRoute = async (req) => {
     try {
         await fs.unlink(path.join(process.cwd(), 'test.db'))
     } catch (err) {
-        console.log(err)
+        /* console.log(err) */
     }
     return new Response(JSON.stringify(res), { status: 200 })
 

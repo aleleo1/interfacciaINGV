@@ -17,6 +17,7 @@
     "@nanostores/solid": "^0.4.2",
     "astro": "^4.0.3",
     "d3": "^7.8.5",
+    "imagekit": "^4.1.4",
     "nanostores": "^0.9.5",
     "node-fetch": "^3.3.2",
     "solid-js": "^1.4.3",

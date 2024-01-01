@@ -35,3 +35,6 @@ localdata/
 *jpg
 *sh
 .vercel
+data.txt
+supabase/*
+list.txt
