@@ -11,6 +11,7 @@ export const GET: APIRoute = async (req) => {
     const url = import.meta.env.IMGKIT_URL
     const badRes = new Response('error', { status: 500 })
     if (!pbk || !url || !pvk) {
+        console.log('API *** IMAGE *** ERROR ON ENV VAR ')
         return badRes;
     }
     const src = req.url.searchParams.get('img')
