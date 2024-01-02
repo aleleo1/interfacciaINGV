@@ -4,14 +4,7 @@ import type { Functions, PropsProvider, Resources, Signals } from "./context.typ
 import { createStore } from 'solid-js/store';
 const IMAGES_SRCS = ['/images/test.jpg', '/images/test2.jpg']
 type CustomImageMetadata = { src: string, base64src: string | false, width: number, height: number, format: string, empty?: boolean }
-const EMPTY_IMAGE: CustomImageMetadata = {
-    src: '',
-    base64src: false,
-    width: 350,
-    height: 450,
-    format: 'jpg',
-    empty: true
-}
+
 const DataContext = createContext<PropsProvider & { stores: { [key: string]: any[] }, images: { image: () => CustomImageMetadata } }>();
 
 export function DataProviderV2(props: any) {
@@ -101,7 +94,7 @@ export function DataProviderV2(props: any) {
 
 
 
-    const signals: Signals = {/*  test, */ loaded, error, imgRef, imgIndexSignal }
+    const signals: Signals = {loaded, error, imgRef, imgIndexSignal }
     const resources: Resources = { dataSource }
     const functions: Functions = { refetch, addImg, getImgDate, load, navigate }
     const stores = { data }

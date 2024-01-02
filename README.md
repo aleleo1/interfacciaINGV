@@ -38,13 +38,13 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
 ## Condizione Attuale
-L'applicazione mostra una demo di 2 grafici rappresentanti dati random caricati da https://jsonplaceholder.typicode.com/comments,
-simulando la velocità di SolidJS nel rappresentare un'insieme di dati nell'UI.
+L'applicazione mostra una demo di vari grafici rappresentanti dati caricati dal file csv _data.csv, precaricarcati in _INGV.db e sfrutando SQLITE, simulo una query a db che restituisce i dato semi-pronti per la rappresentazione grafica.
+Il client SolidJS renderizza i grafici individualmente, caricando copie di dati nel proprio DataContext, e quindi genera grafici indipendenti e navigabili.
+Le immagini sono restituite dall'api image che estrae la base64 string dell'immagine
 Impostazione attuale:
 ---SSR
---- SOLIDJS client caricato appena possibile (client:load directive)
+--- SOLIDJS client caricato appena possibile
 
 
 ## Deploy
 Deploy temporaneo su Vercel: interfaccia-ingv.vercel.app
-

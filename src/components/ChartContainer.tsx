@@ -13,7 +13,7 @@ export default function Container(props: any) {
 
     const { addImg, getImgDate, load, navigate } = dataP.functions;
     const [imgLoaded, setImgLoaded] = createSignal(false)
-    onMount(async () => { console.log('CONTAINER MOUNTED'); await load(); /* await addImg(null, null, 1, true) */ })
+    onMount(async () => { console.log('CONTAINER MOUNTED'); await load(); })
     const [img] = createSignal<any>(<img />)
     createEffect(on(image, () => {
         if (image() !== undefined && image().src !== img().src) {
@@ -29,8 +29,8 @@ export default function Container(props: any) {
     }))
 
 
-    const [barW, setBarW] = createSignal(C.DBW),
-        [barH, setBarH] = createSignal(C.DBH)
+    const [barW,] = createSignal(C.DBW),
+        [barH,] = createSignal(C.DBH)
     return (
 
         <>
@@ -43,14 +43,6 @@ export default function Container(props: any) {
             </div>
             <button onclick={async () => { await addImg(undefined, undefined, -1); }}>-</button>
             <button onclick={async () => { await addImg(undefined, undefined, 1); }}>+</button>
-            {/*     <Show
-                when={loaded[0]()}
-                fallback={<BasicSpinner svg={true} />}
-            >
-                <Show
-                    when={!error[0]()}
-                    fallback={<BasicError msg='Impossibile caricare il grafico' />}
-                > */}
             <Show when={props.type === 'BAR'}>
                 <BarChart
                     width={barW()}
@@ -62,8 +54,6 @@ export default function Container(props: any) {
                     mode={props.mode ?? 'linear'}
                 />
             </Show>
-            {/*   </Show>
-            </Show > */}
             <button onclick={() => { navigate(-1); }}>-</button>
             <button onclick={() => { navigate(+ 1); }}>+</button>
 

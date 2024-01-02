@@ -1,4 +1,4 @@
-import { createSignal, createEffect, For, Show, onMount, onCleanup } from 'solid-js';
+import { createSignal, createEffect, For, Show } from 'solid-js';
 import BaseChart from './BaseXYChart'
 import * as d3 from 'd3';
 import { createStore } from 'solid-js/store';
@@ -15,9 +15,6 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
     const { data } = useData()!.stores
     const [, setImagesIndex] = useData()!.signals.imgIndexSignal
     const { addImg } = useData()!.functions
-/*     onMount(async () => {
-        console.log('MOUNTED')
-    }) */
     const marginTop = 20;
     const marginRight = 20;
     const marginBottom = 30;
@@ -30,14 +27,6 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
         return acc;
     }, {});
 
-    /*     const emptyBarCharts = () => {
-            setBars([])
-        } */
-    /*     createEffect(() => {
-            if (dataSource.loading || dataSource.error) {
-                emptyBarCharts()
-            }
-        }) */
 
     const [hovered, setHovered] = createSignal<any | null>(null)
     const handleMouseOver = (d: MockedData, circle = false) => {
@@ -47,8 +36,6 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
             setBars([d.id!], 'width', w => w! + 12)
             setBars([d.id!], 'x', x => x! - 6)
         }
-        // OPZIONE ON HOVER
-        /* addImg(d.path) */
     }
     const handleMouseOut = (d: MockedData, circle = false) => {
         if (!circle) {

@@ -6,7 +6,6 @@ rimuovere commenti
 
 import sqlite3 from 'sqlite3';
 
-import * as d3 from 'd3'
 import type { APIRoute } from "astro";
 
 import fs from 'node:fs/promises';
@@ -21,9 +20,9 @@ const data = `DATE("Date") AS x,
 "Path" AS path, ROW_NUMBER() OVER (
     ORDER BY "Date"
 ) -1 i,`
-const requests: { [key: string]: { query: (limit?: number, prec?: number) => string; build?: (row: any, i: number) => { x: string | Date | null, y: number, i: number, ylabel?: string } } } = {
+const requests: { [key: string]: { query: (prec?: number) => string; } } = {
     'default': {
-        query: (limit?: number, prec?: number) => `SELECT 
+        query: (prec?: number) => `SELECT 
         ${data}
         CAST(ROUND(ABS(RANDOM()) * 0.00000000000000001) AS INTEGER) AS y,
     ${imageData}
@@ -35,22 +34,14 @@ const requests: { [key: string]: { query: (limit?: number, prec?: number) => str
         WHERE 'Cascading output' NOT LIKE "Cascading output"
         ORDER BY "Date"
         LIMIT 100 ${prec ? 'OFFSET ' + prec.toString() : ''}
-        `,
-        build: (row, i) => (
-            {
-                x: row
-                    ? (d3.isoParse((row['Date']))) : null,
-                y: Math.round(Math.random() * 100),
-                path: row ? '/images/S2/' + row['Path'] : null,
-                i
-            }
-        )
+        `
     },
     'scene_monitoring': {
-        query: (limit?: number, prec?: number) => `
+        query: (prec?: number) => `
         SELECT 
     ${data}
     10 * DENSE_RANK() OVER (ORDER BY "Cascading output" COLLATE NOCASE) AS y,
+    "Cascading output" AS ylabel,
 ${imageData}
     FROM (
         SELECT *,
@@ -62,29 +53,11 @@ ORDER BY
     "Date"
     LIMIT 100 ${prec ? 'OFFSET ' + prec.toString() : ''}
            `,
-        build: (row, i) => (
-            {
-                x: row
-                    ? (d3.isoParse((row['Date']))) : null,
-                y: row.y,
-                ylabel: row['Cascading output'],
-                path: row ? '/images/S2/' + row['Path'] : null,
-                i
-            }
-        )
     },
     'vulcani': {
         query: () => ''
     }
 }
-/* WITH temp AS (
-        SELECT "Cascading output" COLLATE NOCASE, COUNT(*) as count
-        FROM 'DATI'
-        GROUP BY "Cascading output" COLLATE NOCASE
-    )
-    SELECT * FROM temp
-    UNION ALL
-    SELECT 'Total', SUM(count) FROM temp; */
 
 
 export const GET: APIRoute = async (req) => {
@@ -103,11 +76,11 @@ export const GET: APIRoute = async (req) => {
 
     try {
         const file = await (await fetch(req.url.origin + '/db/_INGV.db')).arrayBuffer()
-        await fs.writeFile(/* path.join( *//* process.cwd() */'/tmp/' + 'test.db'/* ) */, Buffer.from(file))
+        await fs.writeFile('/tmp/' + 'test.db', Buffer.from(file))
     } catch (err) {
         console.log(err)
     }
-    const db = new sqlite3.Database(/* path.join( *//* process.cwd() */'/tmp/' + 'test.db'/* ) */, (err) => {
+    const db = new sqlite3.Database('/tmp/' + 'test.db', (err) => {
         if (err) console.log(err)
 
     });
@@ -115,7 +88,7 @@ export const GET: APIRoute = async (req) => {
 
         db.on('open', () => {
             db.serialize(() => {
-                db.all(query(limit, prec), async (err, rows: any) => {
+                db.all(query(prec), async (err, rows: any) => {
                     if (err) {
                         reject(err)
                         console.log(err)
@@ -123,7 +96,7 @@ export const GET: APIRoute = async (req) => {
                     if (rows && rows.length > 0) {
                         rows[0].base64src = await (await fetch(req.url.origin + '/api/image?img=' + rows[0].path)).text()
                     }
-                    rows && resolve(rows/* .map(build) */)
+                    rows && resolve(rows)
                 });
             });
         })

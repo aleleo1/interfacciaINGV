@@ -1,5 +1,5 @@
 ---
-const vulcani = /* await getVulcani() */ await (
+const vulcani = await (
   await fetch(new URL(Astro.request.url).origin + "/api/query?opt=vulcani")
 ).json();
 console.log(vulcani);
