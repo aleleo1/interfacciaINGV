@@ -9,15 +9,20 @@ Folders and files:
 │   └── * public assets like images, logos*
 ├── src/
 │   ├── components/
-│   │   └── * Solid js components *
-|             └── charts/
-│               └── * various charts (barplot, pieplot), import from index.ts *
+│   │   └── * Solid js components files.tsx *
+|   |         └── charts/
+│   |           └── * various charts (barplot, pieplot), import from index.ts *
+|   |         └── context/
+│   |           └── * data.context for handling local data and images *
+│   |         └── * Astro components  files.astro as containers for the plots* 
 │   ├── layouts/
 │   │   └── * Project's main layout *
 │   └── pages/
-│       └── * index.astro as only main page *
-|           └── api (TOBE)/
-│                └── * API functions *
+│   |   └── * index.astro as only main page *
+|   |       └── api /
+│   |            └── * query.ts as query runner * 
+│   |            └── * image.ts to get the images from imagekit * 
+│   └── store.ts for handling data resources (general data) and filters
 └── package.json
 ```
 
@@ -29,8 +34,6 @@ All commands are run from the root of the project, from a terminal:
 | :------------------------ | :----------------------------------------------- |
 | `npm install`             | Installs dependencies                            |
 | `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
