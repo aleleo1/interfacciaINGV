@@ -3,9 +3,9 @@ interface Props {title:string}
 const p = Astro.props
 ---
 
-<h1 class="my-10">{p.title}</h1>
+<h1 class="w-full">{p.title}</h1>
 <div
-    class="border-solid border-gray-500 border-4 gap-y-20 flex flex-col items-center py-10"
+    class="w-full border-solid border-gray-500 border-4 gap-y-20 flex flex-col items-center py-10"
 >
     <slot />
 </div>

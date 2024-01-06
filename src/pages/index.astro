@@ -6,10 +6,9 @@ import Ibox from "../components/ibox.astro";
 ---
 
 <Layout title="Tesi INGV">
-	<main class="flex flex-col justify-center items-center gap-y-20">
-		<div class="w-screen px-40 py-10">
+	<main class="flex flex-col justify-center items-center gap-y-10 px-20 py-10">
 			<div
-				class="border-solid border-gray-500 border-4 gap-y-20 flex flex-row items-start p-10"
+				class="w-full border-solid border-gray-500 border-4 flex flex-row items-start p-10"
 			>
 				<Menu />
 			</div>
@@ -86,14 +85,10 @@ import Ibox from "../components/ibox.astro";
 					
 				/>
 			</Ibox>
-		</div>
+		
 
 		<style>
 			main {
-				margin: auto;
-				padding: 1rem;
-				width: 75%;
-				max-width: calc(100% - 2rem);
 				color: white;
 				font-size: 20px;
 				line-height: 1.6;

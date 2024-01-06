@@ -7,10 +7,10 @@ import type { ContainerProps } from "./context/context.types";
 const p = Astro.props
 ---
 
-<div class="w-full flex flex-col items-start">
-   {p.title.trim() !== '' && <h3 class="ml-20">{p.title}</h3>}
+<div class="w-full p-5">
+   {p.title.trim() !== '' && <h3 class="w-full px-10">{p.title}</h3>}
     <div
-        class="w-full h-fit flex flex-row gap-x-10 justify-evenly items-center p-10"
+        class="w-full h-fit flex flex-row gap-x-10 justify-between items-center p-10"
     >
         <Container
             {...p}
