@@ -66,7 +66,7 @@ export type BarChartProps<T extends Record<string, any>> = {
     nolines?: boolean
     mode?: string
     ylabels?: { [key: number]: string }
-} & Margins & Partial<xy>
+} & Margins & Partial<xy> & { children?: any }
 
 export type PieChartProps<T extends Record<string, any>> = {
     width: number

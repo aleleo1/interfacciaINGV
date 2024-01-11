@@ -20,7 +20,7 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
     const marginBottom = 30;
     const marginLeft = 40;
     const margins = { mt: marginTop, mb: marginBottom, ml: marginLeft, mr: marginRight }
-    const x = () => (d3.scaleTime([marginLeft, (p.width - marginRight)]).domain(d3.extent((data), d => new Date(d.x))))
+    const x = () => (d3.scaleTime([marginLeft, (p.width - marginRight)]).domain(d3.extent((data), d => new Date(d.x)) as Iterable<Date | d3.NumberValue>))
     const y = () => (d3.scaleLinear().range([p.height - marginBottom, 0]).domain([0, (d3.max((data), d => d.y)) * 1.2]))
     const ylabels = () => p.mode === 'verbal' && (data).reduce((acc, d) => {
         acc[d.y] = d.ylabel && d.ylabel.toLowerCase();
