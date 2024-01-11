@@ -9,7 +9,6 @@ const DataContext = createContext<PropsProvider & { stores: { [key: string]: any
 
 export function DataProviderV2(props: any) {
 
-    //TEST SIGNAL FOR FILTERS
     const unique = Math.round(Math.random() * 100)
     const [srcIndexBk, setSrcIndexBk] = createSignal(1)
 
@@ -87,14 +86,14 @@ export function DataProviderV2(props: any) {
 
     //EFFECTS   
 
-    createEffect(() => setLoaded(/* !dataSource.loading */data && data.length > 0))
+    createEffect(() => setLoaded(!dataSource.loading && data && data.length > 0))
     createEffect(() => setError(dataSource.error))
 
 
 
 
 
-    const signals: Signals = {loaded, error, imgRef, imgIndexSignal }
+    const signals: Signals = { loaded, error, imgRef, imgIndexSignal }
     const resources: Resources = { dataSource }
     const functions: Functions = { refetch, addImg, getImgDate, load, navigate }
     const stores = { data }

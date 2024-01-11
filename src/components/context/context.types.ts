@@ -47,7 +47,7 @@ export interface Provider extends PropsProvider, ProviderFunctions { }
 
 /* ***************BAR CHART */
 type xy = {
-    x: d3.ScaleLinear<number, number, never>
+    x: d3.ScaleLinear<number, number, never> | d3.ScaleTime<number, number, never>
     y: d3.ScaleLinear<number, number, never>
 }
 type Margins = {
