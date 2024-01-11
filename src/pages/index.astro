@@ -6,86 +6,81 @@ import Ibox from "../components/ibox.astro";
 ---
 
 <Layout title="Tesi INGV">
-	<main class="flex flex-col justify-center items-center gap-y-10 px-20 py-10">
+	<main
+		class="flex flex-col justify-center items-center gap-y-10 px-20 py-10"
+	>
+		<div class="w-screen p-10">
 			<div
-				class="w-full border-solid border-gray-500 border-4 flex flex-row items-start p-10"
+				class="border-solid border-gray-500 border-4 flex flex-row items-start p-10"
 			>
 				<Menu />
 			</div>
-			<Ibox  title="Thermal Emissions Monitoring">
-				<Icontainer
-					title="Land Surface Temperature (LST)"
-					chartType="BAR"
-					src="lst"
-					oblique={true}
-					circle={true}
-					
-				/>
-				<Icontainer
-					title="Volcanic Radiative Power"
-					chartType="BAR"
-					src="lst"
-					src="lst"
-					circle={true}
-					
-				/>
-				<Icontainer
-					title="Active Craters"
-					chartType="BAR"
-					src="lst"
-					oblique={true}
-					
-				/>
-			</Ibox>
-			<Ibox  title="Scene Monitoring">
-				<Icontainer
-					title=""
-					chartType="BAR"
-					src="scm"
-					circle={true}
-					nolines={true}
-					mode="verbal"
-					
-				/>
-			</Ibox>
-			<Ibox  title="Effusive Activity Monitoring">
-				<Icontainer
-					title="Lava Flow Length / Area"
-					chartType="BAR"
-					src="lst"
-					oblique={true}
-					
-				/>
+		</div>
+		<Ibox title="Thermal Emissions Monitoring">
+			<Icontainer
+				title="Land Surface Temperature (LST)"
+				chartType="BAR"
+				src="lst"
+				oblique={true}
+				circle={true}
+			/>
+			<Icontainer
+				title="Volcanic Radiative Power"
+				chartType="BAR"
+				src="lst"
+				src="lst"
+				circle={true}
+			/>
+			<Icontainer
+				title="Active Craters"
+				chartType="BAR"
+				src="lst"
+				oblique={true}
+			/>
+		</Ibox>
+		<Ibox title="Scene Monitoring">
+			<Icontainer
+				title=""
+				chartType="BAR"
+				src="scm"
+				circle={true}
+				nolines={true}
+				mode="verbal"
+			/>
+		</Ibox>
+		<Ibox title="Effusive Activity Monitoring">
+			<Icontainer
+				title="Lava Flow Length / Area"
+				chartType="BAR"
+				src="lst"
+				oblique={true}
+			/>
 
-				<Icontainer
-					title="Numero Hotspot / Lava Flow Length"
-					chartType="BAR"
-					src="lst"
-					circle={true}
-					nolines={true}
-					
-				/>
+			<Icontainer
+				title="Numero Hotspot / Lava Flow Length"
+				chartType="BAR"
+				src="lst"
+				circle={true}
+				nolines={true}
+			/>
 
-				<Icontainer
-					title="Lava Front"
-					chartType="BAR"
-					src="lst"
-					circle={true}
-					
-				/>
-			</Ibox>
+			<Icontainer
+				title="Lava Front"
+				chartType="BAR"
+				src="lst"
+				circle={true}
+			/>
+		</Ibox>
 
-			<Ibox  title="Explosive Activity Monitoring">
-				<Icontainer
-					title="Volcanic Cloud"
-					chartType="BAR"
-					src="lst"
-					circle={true}
-					nolines={true}
-					
-				/>
-			</Ibox>
-		
+		<Ibox title="Explosive Activity Monitoring">
+			<Icontainer
+				title="Volcanic Cloud"
+				chartType="BAR"
+				src="lst"
+				circle={true}
+				nolines={true}
+			/>
+		</Ibox>
 
 		<style>
 			main {
