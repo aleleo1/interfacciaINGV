@@ -15,27 +15,8 @@ const { title } = Astro.props;
 		<link rel="icon" type="image/svg+xml" href="favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
-		<!-- <ViewTransitions fallback="none" /> -->
 	</head>
 	<body>
-		<!-- <script lang="javascript" is:inline>
-			console.log("we");
-
-			document.addEventListener("DOMContentLoaded", () => {
-				console.log("DOM LOADED");
-				document.startViewTransition(()=>{console.log('STARTED VIEW TRANS')});
-			});
-			
-			document.addEventListener("astro:before-preparation", () => {
-				console.log("BEFORE");
-			});
-			document.addEventListener("astro:after-preparation", () => {
-				console.log("AFTER");
-			});
-			document.addEventListener("astro:page-load", () => {
-				console.log("LOADED");
-			});
-		</script> -->
 		<slot />
 		<style is:global>
 			:root {

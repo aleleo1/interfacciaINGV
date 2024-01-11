@@ -8,6 +8,7 @@ export default function BaseChart<T extends Record<string, any>>(p: ChartProps<T
         [gy, setgy] = createSignal<any>(null)
 
     const svg = (): any => (<svg
+    class={`lg:w-auto w-screen`}
         viewBox={`-20 -10 ${p.width + 20} ${p.height + 40}`}
         width={p.width}
         height={p.height}
