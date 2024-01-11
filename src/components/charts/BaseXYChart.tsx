@@ -7,15 +7,6 @@ export default function BaseChart<T extends Record<string, any>>(p: ChartProps<T
     const [gx, setgx] = createSignal<any>(null),
         [gy, setgy] = createSignal<any>(null)
 
-    const svg = (): any => (<svg
-    class={`lg:w-auto w-screen`}
-        viewBox={`-20 -10 ${p.width + 20} ${p.height + 40}`}
-        width={p.width}
-        height={p.height}
-        preserveAspectRatio="xMidYMid meet"
-        xmlns="http://www.w3.org/2000/svg"
-    >{gx()}{gy()}{p.children}</svg>)
-
 
 
     const xAxis = () => d3.axisBottom(p.x!).ticks(d3.timeMonth.every(0.3), d3.timeYear.every(0.5)).tickFormat(d3.timeFormat("%d %m %y") as (...args: any) => string)
@@ -43,5 +34,12 @@ export default function BaseChart<T extends Record<string, any>>(p: ChartProps<T
         d3.select(gy()).call(yAxis())
     })
 
-    return svg();
+    return (<svg
+        class={`lg:w-auto w-screen`}
+        viewBox={`-20 -10 ${p.width + 20} ${p.height + 40}`}
+        width={p.width}
+        height={p.height}
+        preserveAspectRatio="xMidYMid meet"
+        xmlns="http://www.w3.org/2000/svg"
+    >{gx()}{gy()}{p.children}</svg>);
 }
