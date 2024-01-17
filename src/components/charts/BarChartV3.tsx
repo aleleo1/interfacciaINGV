@@ -1,145 +1,213 @@
-import { createSignal, createEffect, For, Show } from 'solid-js';
+import { createSignal, createEffect, For, Show, onMount, createResource, on, type Signal } from 'solid-js';
 import BaseChart from './BaseXYChart'
 import * as d3 from 'd3';
 import { createStore } from 'solid-js/store';
 import type { BarChartProps as ChartProps } from '../context/context.types';
 import { useData } from '../context/data.context.v2';
 import { BasicError, BasicSpinner } from '../components.utils';
+import Plotly from 'plotly.js-dist'
+import { getQueryInterval } from '../../store';
 
 type D3Data = { x: number; y: number; width: number; height: number; color: any; id: number; path?: string }
 type MockedData = Partial<D3Data & { x: number; y: number }>
 
 export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>) {
-    const [bars, setBars] = createStore<MockedData[]>([]);
-    const { loaded, error, imgRef } = useData()!.signals
-    const { data } = useData()!.stores
-    const [, setImagesIndex] = useData()!.signals.imgIndexSignal
-    const { addImg } = useData()!.functions
-    const marginTop = 20;
-    const marginRight = 20;
-    const marginBottom = 30;
-    const marginLeft = 40;
-    const margins = { mt: marginTop, mb: marginBottom, ml: marginLeft, mr: marginRight }
-    const x = () => (d3.scaleTime([marginLeft, (p.width - marginRight)]).domain(d3.extent((data), d => new Date(d.x)) as Iterable<Date | d3.NumberValue>))
-    const y = () => (d3.scaleLinear().range([p.height - marginBottom, 0]).domain([0, (d3.max((data), d => d.y)) * 1.2]))
-    const ylabels = () => p.mode === 'verbal' && (data).reduce((acc, d) => {
-        acc[d.y] = d.ylabel && d.ylabel.toLowerCase();
-        return acc;
-    }, {});
+    const test = createSignal<any>(<div style={`width:1000px;height:550px;background: #13151a;`}></div>)
+
+    /*    const [bars, setBars] = createStore<MockedData[]>([]); */
+    const { loaded, error, imgRef, afternav, localInterval, min, max, lIndex, isFull, navDirS, graphHelperSignal, firstLoad } = useData()!.signals
+    const [isFirstLoad, setFirstLoad] = firstLoad
+    const [graphHelper, setGraphHelper] = graphHelperSignal
+    const [navDir, setNavDir] = navDirS
+    /*     const [lInterval, setLocalInterval] = localInterval */
+    const [minimo, setMinimo] = min
+    const [massimo, setMassimo] = max
+    const { addImg, getLocalInterval, fullLen, } = useData()!.functions
+    const [localDataIndex, setLocalDataIndex] = lIndex
+    const data = useData()!.stores.data
+    const [afterNav, setAfterNav] = afternav
+    const x = () => (d3.scaleTime([0, data.length - 1]).domain(d3.extent((data), d => new Date(d.x)) as Iterable<Date | d3.NumberValue>))
+    const xlabels = () => (data).map(d => (d.x))
+    /*     onMount(async () => await buildPlot()) */
+    const plotMode = p.circle && p.oblique ? 'lines+markers' : p.circle ? 'markers' : p.oblique ? 'lines' : ''
+    const plotType = p.circle && p.oblique ? 'scatter' : !p.nolines ? 'bar' : !p.oblique ? 'scatter' : ''
+    const ticksOptions = {
+        tickmode: 'array',
+        ticktext: Array.from({ length: Math.floor(data.length / 10) }, (_, i) => data[i * 10].x),
+        tickvals: Array.from({ length: Math.floor(data.length / 10) }, (_, i) => data[i * 10].x),
+    }
+    const r = () => data.length > 0 && [data[minimo()].x, data[massimo()].x]
+    const buildPlot = async () => (
+        (await Plotly.newPlot(test[0](),
+            [{
+
+                x: xlabels(),
+
+                y: ylabels(),
+                type: plotType,
+                mode: plotMode, marker: { size: 16 },
+
+            }],
+            {
+                xaxis: {
+                    showgrid: true,
+                    gridcolor: '#7f7f7f',
+                    range: r(),
+                    ticklabelmode: 'period',
+                    /* ...ticksOptions */
+
+
+                },
+                yaxis: {
+                    showgrid: true,
+                    gridcolor: '#7f7f7f',
+                    range: p.mode !== 'verbal' ? [[0, (d3.max((data), d => d.y)) * 1.2]] : undefined
+                },
+                colorway: Array.from({ length: data.length }, (v, i) => d3
+                    .scaleSequential(d3.interpolateWarm)
+                    .domain([0, (data).length])(i)),
+                paper_bgcolor: '#13151a', plot_bgcolor: '#13151a',
+                margin: { t: 10, b: 100 },
+                font: {
+
+                    family: 'Courier New, monospace',
+
+                    size: 14,
+
+                    color: '#7f7f7f'
+
+                }
+            })).on('plotly_click', function (datas: any) {
+
+                var obj;
+                for (var i = 0; i < datas.points.length; i++) {
+                    obj = datas.points[i];
+
+                }
+                handleClick(data[obj.pointIndex])
+
+            }).on('plotly_hover', function (datas: any) {
+                handleMouseOver(data[datas.points[0].pointIndex])
+
+            }).on('plotly_unhover', function (datas: any) {
+
+                handleMouseOut(data[datas.points[0].pointIndex])
+
+            })
+    )
+    const plot = createResource(buildPlot)
+
+    const ylabels = () => p.mode === 'verbal' ? data.map(d => d.ylabel) : (data).map(d => d.y);
+    const animate = async () => {
+        console.log('***ND: ', navDir() && graphHelper())
+        const base = {
+            traces: [0],
+
+            layout: {
+                xaxis: {
+                    range: r(),
+                },
+            }
+        }
+        const payload =
+            navDir() && graphHelper()
+                ? {
+
+                    data: [{ y: ylabels(), x: xlabels() }],
+                    ...base
+
+                }
+                : {
+                    ...base
+                }
+        await Plotly.animate(test[0](), payload, {
+            transition: {
+                duration: 300,
+                easing: 'cubic-in-out'
+            },
+            frame: {
+                duration: 300
+            }
+        })
+    }
+
+    /*     createEffect(on(loaded[0], async (val, prevVal) => {
+            if (loaded[0]() && val !== prevVal && data.length === getQueryInterval()) {
+                console.log('BUILDING PLOT')
+                await buildPlot();
+    
+            }
+    
+        })) */
+    createEffect(on(isFirstLoad, async (val, prevVal) => {
+        console.log('DAD EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', (!val && val !== prevVal && loaded[0]()))
+        if (!val && val !== prevVal && loaded[0]()) {
+            await buildPlot()
+        }
+
+    }))
+
+    createEffect(on(minimo, async (val: any, prevVal: any) => {
+        console.log('MINIMO EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', (loaded[0]() && val !== prevVal))
+
+        if (loaded[0]() && val !== prevVal) {
+            console.log('WEEEE', val)
+            await animate()
+            setGraphHelper(false)
+        }
+
+    }))
+
+    /*     createEffect(on(lInterval, () => {
+            animate()
+        })) */
+
+
 
 
     const [hovered, setHovered] = createSignal<any | null>(null)
-    const handleMouseOver = (d: MockedData, circle = false) => {
-
+    const [clicked, setClicked] = createSignal<any | null>(null)
+    const handleMouseOver = (d: any, circle = false) => {
         setHovered(d)
-        if (!circle) {
-            setBars([d.id!], 'width', w => w! + 12)
-            setBars([d.id!], 'x', x => x! - 6)
-        }
+
     }
-    const handleMouseOut = (d: MockedData, circle = false) => {
-        if (!circle) {
-            setBars([d.id!], 'width', w => w! - 12)
-            setBars([d.id!], 'x', x => x! + 6)
-        }
+    const handleMouseOut = (d: any, circle = false) => {
+
         setHovered(null)
     }
-    const handleClick = (d: MockedData) => {
+    const handleClick = (d: any) => {
         addImg(d.path, d.id)
+        setClicked(d)
     }
-    createEffect(() => {
-        if ((data).length > 0) {
-            const colorGenerator = d3
-                .scaleSequential(d3.interpolateWarm)
-                .domain([0, (data).length])
-            setBars(
-                (data).map((d, i) => ({
-                    x: x()(new Date(d.x)),
-                    y: y()(d.y),
-                    width: 1.5,
-                    height: p.height - y()(d.y) - marginBottom,
-                    xlabel: new Date(d.x).toLocaleDateString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
-                    ylabel: d.y,
-                    color: colorGenerator(i),
-                    id: d.i,
-                    path: d.path
-                }))
-            );
-        }
-    })
+
+    const setInterval = (ev: any) => {
+        const i = ev.target.value && ev.target.value - 1
+        if (i && i !== getLocalInterval() + 1)
+            if (i < getLocalInterval())
+                setMassimo(minimo() + i);
+            else setMassimo(massimo() + (i - getLocalInterval()))
+        /*         console.log(massimo()) */
+
+    }
+
 
 
     return (
-        <div>
+        <div class='flex flex-col gap-x-10'>
+            {/* <input type="range" class="w-full h-10" min={range()[0]} max={range()[1]} step="1" /> */}
+            <div class='flex flex-row gap-x-10 text-sm'>
+                <p class='text-white'>Num elementi in view: {isFull[0]() ? 'full: ' : ''} {fullLen() || data.length}</p>
+                <p>from: {r()[0] ?? ''}; to: {r()[1] ?? ''}</p>
+                <p>
+                    <label for="interval">Totale dati: </label>
+                    <input name="interval" type="number" value={getLocalInterval() + 1} class='w-20 h-4 text-black' onchange={setInterval} />
+                </p>
+            </div>
             <Show
-                when={loaded[0]()}
-                fallback={<BasicSpinner svg={true} />}
-            >
-                <Show
-                    when={!error[0]()}
-                    fallback={<BasicError msg='Impossibile caricare il grafico' />}
-                >
-                    <BaseChart {...Object.assign({}, p, margins, { x: x(), y: y(), ylabels: ylabels() })} >
-                        <For each={bars}>
-                            {(bar, index) => (
-                                <>
-                                    {!p.nolines && (!p.oblique ?
-                                        <rect
-                                            x={bar.x}
-                                            y={bar.y}
-                                            width={bar.width}
-                                            height={bar.height}
-                                            fill={bar.color}
-                                            onMouseOver={() => !p.circle ? handleMouseOver(bar) : {}}
-                                            onMouseOut={() => !p.circle ? handleMouseOut(bar) : {}}
-                                            onclick={() => !p.circle ? handleClick(bar) : {}}
-                                        />
-                                        : <line
-                                            x1={(index() - 1 >= 0) ? bars[index() - 1].x : bars[index()].x}
-                                            y1={bars[index() - 1] ? bars[index() - 1].y : bars[index()].y}
-                                            x2={bar.x}
-                                            y2={bar.y}
-                                            onMouseOver={() => !p.circle ? handleMouseOver(bar) : {}}
-                                            onMouseOut={() => !p.circle ? handleMouseOut(bar) : {}}
-                                            onclick={() => !p.circle ? handleClick(bar) : {}}
-                                            style={`stroke:${bar.color};stroke-width:${bar.width}`} />)}
-                                    {p.circle && <circle
-                                        cx={bar.x}
-                                        cy={bar.y}
-                                        r="5"
-                                        fill={bar.color}
-                                        stroke-width="2"
-                                        onMouseOver={() => handleMouseOver(bar, true)}
-                                        onMouseOut={() => handleMouseOut(bar, true)}
-                                        onclick={() => handleClick(bar)} />
-                                    }
-                                </>
-                            )}
-                        </For>
-                    </BaseChart>
-                </Show>
-            </Show >
-            <Show
-                when={hovered()}
-                fallback={<div class="p-3">...</div>}
-            >
-                {(item) => (
-                    <div class="w-fit flex items-center gap-2 p-3">
-                        <div
-                            class="rounded-md w-5 aspect-square"
-                            style={{
-                                'background-color': item().color,
-                            }}
-                        />
-                        <span>
-                            X: {item().xlabel}; Y: {item().ylabel}
-                        </span>
-                    </div>
-                )}
-            </Show>
-
-
-
+                when={plot[0].loading}
+            ><BasicSpinner svg={true} /></Show>
+            {test[0]()}
         </div>
+
     );
 }

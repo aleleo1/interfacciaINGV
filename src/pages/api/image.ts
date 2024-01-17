@@ -15,39 +15,44 @@ export const GET: APIRoute = async (req) => {
         return badRes;
     }
     const src = req.url.searchParams.get('img')
-        const getImageKit = new Promise<ImageKit>((resolve, reject) => {
-            let ie;
-            try {
-                ie = new ImageKit({
-                    publicKey: pbk,
-                    privateKey: pvk,
-                    urlEndpoint: url
-                });
-                resolve(ie)
-            } catch (err) {
-                console.log(err)
-            }
-        })
-    
-        const imagekit = await getImageKit
-    
+    const getImageKit = new Promise<ImageKit>((resolve, reject) => {
+        let ie;
+        try {
+            ie = new ImageKit({
+                publicKey: pbk,
+                privateKey: pvk,
+                urlEndpoint: url
+            });
+            resolve(ie)
+        } catch (err) {
+            console.log(err)
+        }
+    })
 
-        const imageUrl = new Promise<string>((resolve, reject) => {
-            try {
-                const u = imagekit.url({
-                    path: `/${src}`,
-                    urlEndpoint: url,
-                    transformation: [{
-                        "height": "450",
-                        "width": "350"
-                    }]
-                })
-                resolve(u)
-            } catch (err) {
-                console.log(err)
-            }
-    
-        })
-    const base64 = toBase64(await (await fetch(await imageUrl)).arrayBuffer())
-    return new Response('data:image/jpeg;base64,' + base64, { status: 200 })
+    const imagekit = await getImageKit
+
+
+    const imageUrl = new Promise<string>((resolve, reject) => {
+        try {
+            const u = imagekit.url({
+                path: `/${src}`,
+                urlEndpoint: url,
+                transformation: [{
+                    "height": "450",
+                    "width": "350"
+                }]
+            })
+            resolve(u)
+        } catch (err) {
+            console.log(err)
+        }
+
+    })
+    try {
+        const base64 = toBase64(await (await fetch(await imageUrl)).arrayBuffer())
+        return new Response('data:image/jpeg;base64,' + base64, { status: 200 })
+
+    } catch (err) {
+        return badRes
+    }
 }

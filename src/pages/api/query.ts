@@ -16,7 +16,8 @@ const imageData = `CASE WHEN row_num = 1 THEN FALSE ELSE TRUE END AS empty,
 350 as width,
 450 as height,
 'jpg' as format`
-const data = `DATE("Date") AS x,
+const data = `
+DATE("Date") AS x,
 "Path" AS path, ROW_NUMBER() OVER (
     ORDER BY "Date"
 ) -1 i,`
@@ -63,7 +64,7 @@ ORDER BY
 export const GET: APIRoute = async (req) => {
     const param = req.url.searchParams && req.url.searchParams.get('opt')
     const limit = (req.url.searchParams && req.url.searchParams.get('limit')) ? (Number.parseInt(req.url.searchParams.get('limit')!)) : undefined
-    const prec = limit && (limit > 1 ? ((limit - 1) * 100) + 99 : 0)
+    const prec = limit && (limit > 1 ? ((limit - 2) * 100) + 100 : 0)
 
     if (param && param === 'vulcani') {
         console.log('FOUND VULCANI')
@@ -82,8 +83,8 @@ export const GET: APIRoute = async (req) => {
     }
     const db = new sqlite3.Database('/tmp/' + 'test.db', (err) => {
         if (err) console.log(err)
-
     });
+
     const response = () => new Promise<any>((resolve, reject) => {
 
         db.on('open', () => {
@@ -96,7 +97,7 @@ export const GET: APIRoute = async (req) => {
                     if (rows && rows.length > 0) {
                         rows[0].base64src = await (await fetch(req.url.origin + '/api/image?img=' + rows[0].path)).text()
                     }
-                    rows && resolve(rows)
+                    rows && resolve(rows.length > 0 ? rows : [{ limit: true }])
                 });
             });
         })
@@ -106,7 +107,6 @@ export const GET: APIRoute = async (req) => {
     try {
         await fs.unlink(path.join(process.cwd(), 'test.db'))
     } catch (err) {
-        /* console.log(err) */
     }
     return new Response(JSON.stringify(res), { status: 200 })
 

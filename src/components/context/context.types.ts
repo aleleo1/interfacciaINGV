@@ -1,4 +1,4 @@
-import type { Resource, Signal } from "solid-js";
+import type { Accessor, Resource, Signal } from "solid-js";
 /* ******************** DATA TYPES */
 type DataType = any; // Replace with the actual type
 type ElaborationType = any; // Replace with the actual type
@@ -66,6 +66,7 @@ export type BarChartProps<T extends Record<string, any>> = {
     nolines?: boolean
     mode?: string
     ylabels?: { [key: number]: string }
+    ready?: Accessor<boolean>
 } & Margins & Partial<xy> & { children?: any }
 
 export type PieChartProps<T extends Record<string, any>> = {

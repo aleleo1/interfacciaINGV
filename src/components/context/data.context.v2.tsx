@@ -1,7 +1,6 @@
-import { /* dataStores,  */dataResources, getDataTrigger, loadData, navigateData, local, setLocal } from '../../store';
+import { /* dataStores,  */dataResources, getDataTrigger, loadData, navigateData, fulls, dataStores, getFullLen, getQueryInterval } from '../../store';
 import { createContext, createEffect, createMemo, createResource, createSignal, on, onMount, useContext } from "solid-js";
 import type { Functions, PropsProvider, Resources, Signals } from "./context.types";
-import { createStore } from 'solid-js/store';
 const IMAGES_SRCS = ['/images/test.jpg', '/images/test2.jpg']
 type CustomImageMetadata = { src: string, base64src: string | false, width: number, height: number, format: string, empty?: boolean }
 
@@ -9,11 +8,13 @@ const DataContext = createContext<PropsProvider & { stores: { [key: string]: any
 
 export function DataProviderV2(props: any) {
 
-    const unique = Math.round(Math.random() * 100)
     const [srcIndexBk, setSrcIndexBk] = createSignal(1)
 
 
     //SIGNALS
+    const generalIndex = getDataTrigger[props.src]
+    const firstLoad = createSignal(true)
+    const [isFirstLoad, setFirstLoad] = firstLoad
     const loaded = createSignal(false)
     const [loadedg, setLoaded] = loaded
     const error = createSignal(false)
@@ -21,29 +22,59 @@ export function DataProviderV2(props: any) {
     const imgRef = createSignal<HTMLImageElement | null>(null)
     const imgIndexSignal = createSignal(0)
     const [imagesIndex, setImagesIndex] = imgIndexSignal
-
+    const navDirS = createSignal(true)
+    const [navDir, setNavDir] = navDirS
+    const afternav = createSignal(false)
+    const [afterNav, setAfterNav] = afternav
+    const lIndex = createSignal(1)
+    const [localDataIndex, setLocalDataIndex] = lIndex
+    const isFull = fulls[props.src]
+    const [isDataFull,] = isFull
+    const fullLen = () => getFullLen(props.src)
+    /*     const localInterval = createSignal(100) */
+    const min = createSignal(0)
+    const max = createSignal(99)
+    const [minimo, setMinimo] = min
+    const [massimo, setMassimo] = max
+    /*     const [getLocalInterval, setLocalInterval] = localInterval */
+    const getLocalInterval = () => massimo() - minimo()
+    const graphHelperSignal = createSignal(true)/* && (minimo() + getQueryInterval()) > data.length */
+    const [graphHelper, setGraphHelper] = graphHelperSignal
     //RESOURCES
     const dataSource = dataResources[props.src][0]
 
     //STORES
-    const [data, setData] = createStore<any>([])
-    createEffect(() => {
-        if (local() === 0 || local() === unique) {
-            setData([...(dataSource())]);
-        }
-    })
+    const [data, setData] = dataStores[props.src]
 
 
     //FUNCTIONS
     const { mutate, refetch } = dataResources[props.src][1]
-    const load = async () => {
+    const load = () => {
         loadData[props.src](1)
     }
+
     const navigate = async (val: number) => {
-        setLocal(unique)
-        setSrcIndexBk(navigateData(val, srcIndexBk(), props.src))
-        setImagesIndex(0)
+        if (!loadedg()) return
+        let cond = false
+        setNavDir(val >= 1)
+        if (navDir()) {
+            if (!isDataFull() && (massimo() + getLocalInterval()) > dataLength()) {
+                cond = true
+                console.log('PRE NAVIGATING'); navigateData(localDataIndex() + 1, props.src);
+            }
+            if (isDataFull() && (massimo() + getLocalInterval() > dataLength() && massimo() < (dataLength() - 1))) {
+                setLocalDataIndex(localDataIndex() + 1)
+            }
+            if ((massimo() + getLocalInterval()) < dataLength() && !cond) {
+                setLocalDataIndex(localDataIndex() + 1)
+            }
+        } else {
+            setLocalDataIndex(localDataIndex() + val > 1 ? localDataIndex() + val : 1)
+        }
+        console.log('ACTUAL INDEX: ', localDataIndex(), cond)
     }
+
+
     const base64ImgSrc = async (src: string) => (
         await (await fetch('/api/image?img=' + src)).text()
     )
@@ -73,11 +104,9 @@ export function DataProviderV2(props: any) {
                 return;
             }
             const next = direction > 0 ? ((imagesIndex() + direction < data.length - 1) ? imagesIndex() + direction : 0) : ((imagesIndex() + direction >= 0) ? imagesIndex() + direction : data.length - 1)
-            console.log(checkEmpty(data[next]))
             if (checkEmpty(data[next])) {
 
                 await setImgSrcById(next, data[next].path)
-                console.log('done')
             }
             setImagesIndex(next)
 
@@ -85,17 +114,66 @@ export function DataProviderV2(props: any) {
 
 
     //EFFECTS   
-
-    createEffect(() => setLoaded(!dataSource.loading && data && data.length > 0))
+    const dl = createSignal(0)
+    const [dataLength, setDataLength] = dl
     createEffect(() => setError(dataSource.error))
+    createEffect(() => setLoaded(!dataSource.loading && data && data.length > 0))
+    createEffect(on(loaded[0], (val, prevVal) => {
+        console.log('DATA EFFECT', `${prevVal} - ${val}`, ' RUNNING: ', val && !prevVal && data.length > 0)
+        if (val && !prevVal && data.length > 0) {
+            if (isFirstLoad()) { setFirstLoad(false); return; }
+            setDataLength(data.length)
+            setGraphHelper(true)
+            console.log('DATA EFFECT RESULT: ', val, dataLength())
+        }
+    }))
+    createEffect(on(localDataIndex, (val, prevVal) => {
+        console.log('INDEX EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', !!(prevVal && val && val !== prevVal && dataLength() > 0))
+        if (!!(prevVal && val && val !== prevVal && dataLength() > 0)) {
+            if (val > prevVal) {
+                setMassimo((dataLength() - 1) >= (massimo() + getLocalInterval() + 1) ? massimo() + getLocalInterval() + 1 : dataLength() - 1)
+            }
+            else {
+                if ((massimo() - getLocalInterval()) < getLocalInterval())
+                    setMassimo(getLocalInterval())
+                else
+                    setMassimo((minimo() - 1) >= 0 ? minimo() - 1 : getLocalInterval())
+            }
+            console.log('INDEX EFFECT RESULT: (massimo) ', massimo())
+
+        }
+    }))
+    createEffect(on(dataLength, (val, prevVal) => {
+        console.log('DATALEN EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', !(!val || !loaded[0]() || val === prevVal || isFirstLoad()), 'FIRST LOAD? ', isFirstLoad())
+
+        if (!val || !loaded[0]() || val === prevVal) return;
+        if (isFirstLoad()) {  return }
+        console.log(localDataIndex())
+        setLocalDataIndex(localDataIndex() + 1)
+        console.log('DATALEN EFFECT RESULT: (index) ', localDataIndex())
+
+    }))
+    createEffect(on(massimo, (val, prevVal) => {
+        console.log('MASSIMO EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', !!(!!prevVal && val && val !== prevVal))
+
+        if (!!prevVal && val && val !== prevVal) {
+            if (val > prevVal) {
+                setMinimo(val < (dataLength() - 1) ? prevVal + 1 : dataLength() - (prevVal - minimo() + 1))
+            }
+            else {
+                setMinimo(minimo() - (prevVal - minimo()) - 1 >= 0 ? minimo() - (prevVal - minimo()) - 1 : 0)
+            }
+            console.log('MASSIMO EFFECT RESULT: (minimo) ', minimo())
+
+        }
+    }))
 
 
 
 
-
-    const signals: Signals = { loaded, error, imgRef, imgIndexSignal }
+    const signals: Signals = { loaded, error, imgRef, imgIndexSignal, navDirS, afternav, min, max, lIndex, isFull, graphHelperSignal, firstLoad }
     const resources: Resources = { dataSource }
-    const functions: Functions = { refetch, addImg, getImgDate, load, navigate }
+    const functions: Functions = { refetch, addImg, getImgDate, load, navigate, getLocalInterval, fullLen }
     const stores = { data }
     const images = { image }
 

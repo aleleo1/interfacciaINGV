@@ -8,12 +8,12 @@ const [BarChart] = lazyImports('BarChart')
 
 export default function Container(props: any) {
     const dataP = useData()!
-
     const { image } = useData()!.images
-
     const { addImg, getImgDate, load, navigate } = dataP.functions;
+    const ready = createSignal(false)
+    const [isReady, setReady] = ready
     const [imgLoaded, setImgLoaded] = createSignal(false)
-    onMount(async () => { console.log('CONTAINER MOUNTED'); await load(); })
+    onMount(() => { console.log('CONTAINER MOUNTED'); load(); setReady(true) })
     const [img] = createSignal<any>(<img />)
     createEffect(on(image, () => {
         if (image() !== undefined && image().src !== img().src) {
@@ -27,6 +27,7 @@ export default function Container(props: any) {
 
         }
     }))
+
 
 
     const [barW,] = createSignal(C.DBW),
@@ -52,7 +53,10 @@ export default function Container(props: any) {
                     oblique={props.oblique}
                     nolines={props.nolines}
                     mode={props.mode ?? 'linear'}
+                    ready={isReady}
                 />
+
+
             </Show>
             <button onclick={() => { navigate(-1); }}>-</button>
             <button onclick={() => { navigate(+ 1); }}>+</button>
