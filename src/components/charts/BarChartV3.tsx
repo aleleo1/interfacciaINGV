@@ -197,7 +197,7 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
             {/* <input type="range" class="w-full h-10" min={range()[0]} max={range()[1]} step="1" /> */}
             <div class='flex flex-row gap-x-10 text-sm'>
                 <p class='text-white'>Num elementi in view: {isFull[0]() ? 'full: ' : ''} {fullLen() || data.length}</p>
-                <p>from: {r()[0] ?? ''}; to: {r()[1] ?? ''}</p>
+                <p>{r() ? `from: ${r()[0] ?? ''}; to: ${r()[1] ?? ''}`: ''}</p>
                 <p>
                     <label for="interval">Totale dati: </label>
                     <input name="interval" type="number" value={getLocalInterval() + 1} class='w-20 h-4 text-black' onchange={setInterval} />

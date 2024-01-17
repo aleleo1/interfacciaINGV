@@ -1,4 +1,4 @@
-import { /* dataStores,  */dataResources, getDataTrigger, loadData, navigateData, fulls, dataStores, getFullLen, getQueryInterval } from '../../store';
+import { /* dataStores,  */dataResources, getDataTrigger, loadData, navigateData, fulls, dataStores, getFullLen, local } from '../../store';
 import { createContext, createEffect, createMemo, createResource, createSignal, on, onMount, useContext } from "solid-js";
 import type { Functions, PropsProvider, Resources, Signals } from "./context.types";
 const IMAGES_SRCS = ['/images/test.jpg', '/images/test2.jpg']
@@ -12,6 +12,7 @@ export function DataProviderV2(props: any) {
 
 
     //SIGNALS
+    const unique = Math.round(Math.random() * 1000)
     const generalIndex = getDataTrigger[props.src]
     const firstLoad = createSignal(true)
     const [isFirstLoad, setFirstLoad] = firstLoad
@@ -60,7 +61,7 @@ export function DataProviderV2(props: any) {
         if (navDir()) {
             if (!isDataFull() && (massimo() + getLocalInterval()) > dataLength()) {
                 cond = true
-                console.log('PRE NAVIGATING'); navigateData(localDataIndex() + 1, props.src);
+                console.log('PRE NAVIGATING'); navigateData(localDataIndex() + 1, props.src, unique);
             }
             if (isDataFull() && (massimo() + getLocalInterval() > dataLength() && massimo() < (dataLength() - 1))) {
                 setLocalDataIndex(localDataIndex() + 1)
@@ -147,14 +148,14 @@ export function DataProviderV2(props: any) {
         console.log('DATALEN EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', !(!val || !loaded[0]() || val === prevVal || isFirstLoad()), 'FIRST LOAD? ', isFirstLoad())
 
         if (!val || !loaded[0]() || val === prevVal) return;
-        if (isFirstLoad()) {  return }
+        if (isFirstLoad() || local() !== unique) { return }
         console.log(localDataIndex())
         setLocalDataIndex(localDataIndex() + 1)
         console.log('DATALEN EFFECT RESULT: (index) ', localDataIndex())
 
     }))
     createEffect(on(massimo, (val, prevVal) => {
-        console.log('MASSIMO EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', !!(!!prevVal && val && val !== prevVal))
+        console.log('MASSIMO EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', (!!prevVal && val && val !== prevVal))
 
         if (!!prevVal && val && val !== prevVal) {
             if (val > prevVal) {

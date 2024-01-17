@@ -48,9 +48,9 @@ const setData = (prop: string) => (
     (prevData: any[]) => { if (dataResources[prop][0]().length > 0) prevData.push(...dataResources[prop][0]()) }))
 )
 
-export const navigateData = (index: number, prop: string) => {
+export const navigateData = (index: number, prop: string, unique: number) => {
   console.log('NAVIGATING')
-
+  setLocal(unique)
   if (!dataResources[prop][0].loading) {
     setTrigger(index, prop);
   }
