@@ -45,7 +45,7 @@ export default function Container(props: any) {
             <button onclick={async () => { await addImg(undefined, undefined, -1); }}>-</button>
             <button onclick={async () => { await addImg(undefined, undefined, 1); }}>+</button>
             <Show when={props.type === 'BAR'}>
-                {/* <BarChart
+                <BarChart
                     width={barW()}
                     height={barH()}
                     margin={10}
@@ -54,7 +54,7 @@ export default function Container(props: any) {
                     nolines={props.nolines}
                     mode={props.mode ?? 'linear'}
                     ready={isReady}
-                /> */}
+                />
 
 
             </Show>

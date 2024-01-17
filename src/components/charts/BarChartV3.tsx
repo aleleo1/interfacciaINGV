@@ -5,7 +5,7 @@ import { createStore } from 'solid-js/store';
 import type { BarChartProps as ChartProps } from '../context/context.types';
 import { useData } from '../context/data.context.v2';
 import { BasicError, BasicSpinner } from '../components.utils';
-import Plotly from 'plotly.js-dist'
+import Plotly, { type PlotType, type PlotData } from 'plotly.js-dist-min'
 import { getQueryInterval } from '../../store';
 
 type D3Data = { x: number; y: number; width: number; height: number; color: any; id: number; path?: string }
@@ -44,15 +44,15 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
                 x: xlabels(),
 
                 y: ylabels(),
-                type: plotType,
-                mode: plotMode, marker: { size: 16 },
+                type: plotType as PlotType,
+                mode: plotMode as PlotData["mode"], marker: { size: 16 },
 
             }],
             {
                 xaxis: {
                     showgrid: true,
                     gridcolor: '#7f7f7f',
-                    range: r(),
+                    range: r() || [],
                     ticklabelmode: 'period',
                     /* ...ticksOptions */
 
@@ -197,7 +197,7 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
             {/* <input type="range" class="w-full h-10" min={range()[0]} max={range()[1]} step="1" /> */}
             <div class='flex flex-row gap-x-10 text-sm'>
                 <p class='text-white'>Num elementi in view: {isFull[0]() ? 'full: ' : ''} {fullLen() || data.length}</p>
-                <p>{r() ? `from: ${r()[0] ?? ''}; to: ${r()[1] ?? ''}`: ''}</p>
+                <p>{r() ? `from: ${(r() as any)[0] ?? ''}; to: ${(r() as any)[1] ?? ''}` : ''}</p>
                 <p>
                     <label for="interval">Totale dati: </label>
                     <input name="interval" type="number" value={getLocalInterval() + 1} class='w-20 h-4 text-black' onchange={setInterval} />
