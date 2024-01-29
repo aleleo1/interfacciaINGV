@@ -1,12 +1,9 @@
-import { createSignal, createEffect, For, Show, onMount, createResource, on, type Signal } from 'solid-js';
-import BaseChart from './BaseXYChart'
+import { createSignal, createEffect, Show, createResource, on } from 'solid-js';
 import * as d3 from 'd3';
-import { createStore } from 'solid-js/store';
 import type { BarChartProps as ChartProps } from '../context/context.types';
 import { useData } from '../context/data.context.v2';
-import { BasicError, BasicSpinner } from '../components.utils';
+import { BasicSpinner } from '../components.utils';
 import Plotly, { type PlotType, type PlotData } from 'plotly.js-dist-min'
-import { getQueryInterval } from '../../store';
 
 type D3Data = { x: number; y: number; width: number; height: number; color: any; id: number; path?: string }
 type MockedData = Partial<D3Data & { x: number; y: number }>
@@ -36,9 +33,10 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
         ticktext: Array.from({ length: Math.floor(data.length / 10) }, (_, i) => data[i * 10].x),
         tickvals: Array.from({ length: Math.floor(data.length / 10) }, (_, i) => data[i * 10].x),
     }
+    const annotations_bk: Plotly.Annotations[] = []
     const r = () => data.length > 0 && [data[minimo()].x, data[massimo()].x]
-    const buildPlot = async () => (
-        (await Plotly.newPlot(test[0](),
+    const buildPlot = async () => {
+        const newPlot = (await Plotly.newPlot(test[0](),
             [{
 
                 x: xlabels(),
@@ -77,28 +75,51 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
                     color: '#7f7f7f'
 
                 }
-            })).on('plotly_click', function (datas: any) {
+            }, { responsive: true }))
+        newPlot.on('plotly_click', function (datas: any) {
 
-                var obj;
-                for (var i = 0; i < datas.points.length; i++) {
-                    obj = datas.points[i];
+            handleClick(data[datas.points[0].pointIndex]);
 
-                }
-                handleClick(data[obj.pointIndex])
 
-            }).on('plotly_hover', function (datas: any) {
-                handleMouseOver(data[datas.points[0].pointIndex])
 
-            }).on('plotly_unhover', function (datas: any) {
+            const annotate_text = 'x = ' + datas.points[0].x +
+                ' y = ' + datas.points[0].y;
 
-                handleMouseOut(data[datas.points[0].pointIndex])
+            const annotation = {
+                text: annotate_text,
+                x: datas.points[0].x,
+                y: datas.points[0].y,
+                bgcolor: 'rgba(255, 255, 255, 0.9)',
+                arrowcolor: datas.points[0].fullData.marker.color,
+                font: {
 
-            })
-    )
+                    color: "black",
+
+                    size: 12
+
+                },
+            } as Plotly.Annotations
+            annotations_bk.pop()
+            annotations_bk.push(annotation);
+            Plotly.relayout(test[0](), { annotations: annotations_bk })
+
+
+
+        })
+        newPlot.on('plotly_hover', function (datas: any) {
+            handleMouseOver(data[datas.points[0].pointIndex])
+
+        })
+        newPlot.on('plotly_unhover', function (datas: any) {
+
+            handleMouseOut(data[datas.points[0].pointIndex])
+
+        })
+    }
     const plot = createResource(buildPlot)
 
     const ylabels = () => p.mode === 'verbal' ? data.map(d => d.ylabel) : (data).map(d => d.y);
-    const animate = async () => {
+    const animate = () => {
         console.log('***ND: ', navDir() && graphHelper())
         const base = {
             traces: [0],
@@ -120,25 +141,23 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
                 : {
                     ...base
                 }
-        await Plotly.animate(test[0](), payload, {
+        Plotly.animate(test[0](), payload, {
             transition: {
                 duration: 300,
                 easing: 'cubic-in-out'
             },
             frame: {
-                duration: 300
+                duration: 300,
+                redraw: false
             }
         })
     }
 
-    /*     createEffect(on(loaded[0], async (val, prevVal) => {
-            if (loaded[0]() && val !== prevVal && data.length === getQueryInterval()) {
-                console.log('BUILDING PLOT')
-                await buildPlot();
-    
-            }
-    
-        })) */
+    const animateAxis = () => {
+        console.log('CHANGING AXIS')
+        Plotly.update(test[0](), {}, { yaxis: { range: [0, 200] } });
+    }
+
     createEffect(on(isFirstLoad, async (val, prevVal) => {
         console.log('DAD EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', (!val && val !== prevVal && loaded[0]()))
         if (!val && val !== prevVal && loaded[0]()) {
@@ -148,26 +167,22 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
     }))
 
     createEffect(on(minimo, async (val: any, prevVal: any) => {
-        console.log('MINIMO EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', (loaded[0]() && val !== prevVal))
+        console.log('MINIMO EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', (loaded[0]()))
 
-        if (loaded[0]() && val !== prevVal) {
+        if (loaded[0]()) {
             console.log('WEEEE', val)
-            await animate()
+            animate()
             setGraphHelper(false)
         }
 
-    }))
-
-    /*     createEffect(on(lInterval, () => {
-            animate()
-        })) */
-
-
+    }, { defer: true }))
+    const dataInfo = () => ((hovered() || clicked()) ? hovered() ?? clicked() : { x: 'nd', y: 'nd' })
 
 
     const [hovered, setHovered] = createSignal<any | null>(null)
     const [clicked, setClicked] = createSignal<any | null>(null)
     const handleMouseOver = (d: any, circle = false) => {
+        console.log('HOVER')
         setHovered(d)
 
     }
@@ -183,9 +198,7 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
     const setInterval = (ev: any) => {
         const i = ev.target.value && ev.target.value - 1
         if (i && i !== getLocalInterval() + 1)
-            if (i < getLocalInterval())
-                setMassimo(minimo() + i);
-            else setMassimo(massimo() + (i - getLocalInterval()))
+            setMinimo(massimo() - i > 0 ? massimo() - i : 0);
         /*         console.log(massimo()) */
 
     }
@@ -196,6 +209,7 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
         <div class='flex flex-col gap-x-10'>
             {/* <input type="range" class="w-full h-10" min={range()[0]} max={range()[1]} step="1" /> */}
             <div class='flex flex-row gap-x-10 text-sm'>
+                <button onclick={animateAxis}>ANIMATE Y</button>
                 <p class='text-white'>Num elementi in view: {isFull[0]() ? 'full: ' : ''} {fullLen() || data.length}</p>
                 <p>{r() ? `from: ${(r() as any)[0] ?? ''}; to: ${(r() as any)[1] ?? ''}` : ''}</p>
                 <p>
@@ -207,6 +221,7 @@ export default function BarChart<T extends Record<string, any>>(p: ChartProps<T>
                 when={plot[0].loading}
             ><BasicSpinner svg={true} /></Show>
             {test[0]()}
+            <p>x: {dataInfo().x}; y: {dataInfo().y}</p>
         </div>
 
     );

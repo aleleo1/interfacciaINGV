@@ -1,15 +1,11 @@
-import { /* dataStores,  */dataResources, getDataTrigger, loadData, navigateData, fulls, dataStores, getFullLen, local } from '../../store';
-import { createContext, createEffect, createMemo, createResource, createSignal, on, onMount, useContext } from "solid-js";
+import { dataResources, getDataTrigger, loadData, navigateData, fulls, dataStores, getFullLen, local } from '../../store';
+import { createContext, createEffect, createSignal, on, useContext } from "solid-js";
 import type { Functions, PropsProvider, Resources, Signals } from "./context.types";
-const IMAGES_SRCS = ['/images/test.jpg', '/images/test2.jpg']
 type CustomImageMetadata = { src: string, base64src: string | false, width: number, height: number, format: string, empty?: boolean }
 
 const DataContext = createContext<PropsProvider & { stores: { [key: string]: any[] }, images: { image: () => CustomImageMetadata } }>();
 
 export function DataProviderV2(props: any) {
-
-    const [srcIndexBk, setSrcIndexBk] = createSignal(1)
-
 
     //SIGNALS
     const unique = Math.round(Math.random() * 1000)
@@ -26,7 +22,6 @@ export function DataProviderV2(props: any) {
     const navDirS = createSignal(true)
     const [navDir, setNavDir] = navDirS
     const afternav = createSignal(false)
-    const [afterNav, setAfterNav] = afternav
     const lIndex = createSignal(1)
     const [localDataIndex, setLocalDataIndex] = lIndex
     const isFull = fulls[props.src]
@@ -50,9 +45,9 @@ export function DataProviderV2(props: any) {
 
     //FUNCTIONS
     const { mutate, refetch } = dataResources[props.src][1]
-    const load = () => {
-        loadData[props.src](1)
-    }
+    /*     const load = () => {
+            loadData[props.src](1)
+        } */
 
     const navigate = async (val: number) => {
         if (!loadedg()) return
@@ -61,7 +56,7 @@ export function DataProviderV2(props: any) {
         if (navDir()) {
             if (!isDataFull() && (massimo() + getLocalInterval()) > dataLength()) {
                 cond = true
-                console.log('PRE NAVIGATING'); navigateData(localDataIndex() + 1, props.src, unique);
+                console.log('PRE NAVIGATING'); navigateData(generalIndex() + 1, props.src, unique);
             }
             if (isDataFull() && (massimo() + getLocalInterval() > dataLength() && massimo() < (dataLength() - 1))) {
                 setLocalDataIndex(localDataIndex() + 1)
@@ -84,6 +79,8 @@ export function DataProviderV2(props: any) {
     const getIdBySrc = (src: string, checkEmpty = false) => data.findIndex((elem: any) => elem.path === src && !(checkEmpty && elem.base64src.trim() === ''))
     const setImgSrcById = async (id: number, src: string) => {
         const b64 = await (base64ImgSrc(src));
+        console.log(src)
+        if (b64 === 'error') return;
         setData([id], 'base64src', (b: string) => b + b64)
     }
     const checkEmpty = (d: any) => (d.base64src.trim() === '')
@@ -127,7 +124,7 @@ export function DataProviderV2(props: any) {
             setGraphHelper(true)
             console.log('DATA EFFECT RESULT: ', val, dataLength())
         }
-    }))
+    }, { defer: true }))
     createEffect(on(localDataIndex, (val, prevVal) => {
         console.log('INDEX EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', !!(prevVal && val && val !== prevVal && dataLength() > 0))
         if (!!(prevVal && val && val !== prevVal && dataLength() > 0)) {
@@ -143,7 +140,7 @@ export function DataProviderV2(props: any) {
             console.log('INDEX EFFECT RESULT: (massimo) ', massimo())
 
         }
-    }))
+    }, { defer: true }))
     createEffect(on(dataLength, (val, prevVal) => {
         console.log('DATALEN EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', !(!val || !loaded[0]() || val === prevVal || isFirstLoad()), 'FIRST LOAD? ', isFirstLoad())
 
@@ -153,7 +150,7 @@ export function DataProviderV2(props: any) {
         setLocalDataIndex(localDataIndex() + 1)
         console.log('DATALEN EFFECT RESULT: (index) ', localDataIndex())
 
-    }))
+    }, { defer: true }))
     createEffect(on(massimo, (val, prevVal) => {
         console.log('MASSIMO EFFECT: ', `${prevVal} - ${val}`, ' RUNNING: ', (!!prevVal && val && val !== prevVal))
 
@@ -167,14 +164,14 @@ export function DataProviderV2(props: any) {
             console.log('MASSIMO EFFECT RESULT: (minimo) ', minimo())
 
         }
-    }))
+    }, { defer: true }))
 
 
 
 
     const signals: Signals = { loaded, error, imgRef, imgIndexSignal, navDirS, afternav, min, max, lIndex, isFull, graphHelperSignal, firstLoad }
     const resources: Resources = { dataSource }
-    const functions: Functions = { refetch, addImg, getImgDate, load, navigate, getLocalInterval, fullLen }
+    const functions: Functions = { refetch, addImg, getImgDate, navigate, getLocalInterval, fullLen }
     const stores = { data }
     const images = { image }
 

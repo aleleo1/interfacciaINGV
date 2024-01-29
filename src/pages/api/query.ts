@@ -1,9 +1,3 @@
-//TODO:
-/* 
-npm i path, sqlite3
-rimuovere commenti
-*/
-
 import sqlite3 from 'sqlite3';
 
 import type { APIRoute } from "astro";
@@ -95,7 +89,9 @@ export const GET: APIRoute = async (req) => {
                         console.log(err)
                     }
                     if (rows && rows.length > 0) {
-                        rows[0].base64src = await (await fetch(req.url.origin + '/api/image?img=' + rows[0].path)).text()
+                        const b64 = await (await fetch(req.url.origin + '/api/image?img=' + rows[0].path)).text()
+                        if (b64 !== 'error')
+                            rows[0].base64src = b64
                     }
                     rows && resolve(rows.length > 0 ? rows : [{ limit: true }])
                 });

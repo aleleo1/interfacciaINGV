@@ -9,11 +9,11 @@ const [BarChart] = lazyImports('BarChart')
 export default function Container(props: any) {
     const dataP = useData()!
     const { image } = useData()!.images
-    const { addImg, getImgDate, load, navigate } = dataP.functions;
+    const { addImg, getImgDate, navigate } = dataP.functions;
     const ready = createSignal(false)
     const [isReady, setReady] = ready
     const [imgLoaded, setImgLoaded] = createSignal(false)
-    onMount(() => { console.log('CONTAINER MOUNTED'); load(); setReady(true) })
+    onMount(() => { console.log('CONTAINER MOUNTED'); /* load(); */ })
     const [img] = createSignal<any>(<img />)
     createEffect(on(image, () => {
         if (image() !== undefined && image().src !== img().src) {
